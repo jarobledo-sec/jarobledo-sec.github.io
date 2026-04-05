@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juan Antonio Robledo — Ciberseguridad & Telecomunicaciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080c10;
+    --bg2:       #0d1219;
+    --bg3:       #111923;
+    --border:    #1e2d3d;
+    --accent:    #00d4ff;
+    --accent2:   #0077aa;
+    --accent3:   #ff6b35;
+    --text:      #c8d8e8;
+    --text-dim:  #5a7a99;
+    --text-mid:  #8aabb8;
+    --white:     #f0f8ff;
+    --green:     #00e5a0;
+    --red:       #ff4d6d;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── SCAN LINES ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,212,255,0.012) 2px,
+      rgba(0,212,255,0.012) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9998;
+    opacity: .4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+    height: 60px;
+    background: rgba(8,12,16,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--text-dim); }
+
+  .nav-links {
+    display: flex; gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 80px clamp(1.5rem, 5vw, 4rem) 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: .35;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 80%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,212,255,0.07) 0%, transparent 70%);
+    top: 10%; left: -10%;
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 900px; }
+
+  .hero-label {
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: .6rem;
+  }
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    color: var(--white);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.3rem;
+  }
+  h1 .dim { color: var(--text-dim); font-weight: 400; }
+
+  .hero-sub {
+    font-family: var(--sans);
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-weight: 600;
+    color: var(--accent);
+    margin: 1.2rem 0 1.8rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-desc {
+    max-width: 560px;
+    color: var(--text-mid);
+    font-size: 13.5px;
+    line-height: 1.9;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-badges {
+    display: flex; flex-wrap: wrap; gap: .6rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: .3rem .7rem;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+    transition: all .2s;
+  }
+  .badge:hover { border-color: var(--accent); color: var(--accent); }
+  .badge.active { border-color: var(--accent2); color: var(--accent); background: rgba(0,212,255,0.05); }
+
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .65rem 1.4rem;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all .2s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+  }
+  .btn-primary:hover { background: #33ddff; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,212,255,0.25); }
+
+  .btn-ghost {
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    background: transparent;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── TERMINAL STATUS ── */
+  .terminal-status {
+    position: absolute;
+    bottom: 3rem; right: clamp(1.5rem, 5vw, 4rem);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+  .status-line { display: flex; align-items: center; gap: .5rem; justify-content: flex-end; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+  .dot-yellow { background: #ffd700; }
+  .dot-blue { background: var(--accent); }
+
+  @keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:.4 } }
+
+  /* ── SECTIONS ── */
+  section { padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,4rem); }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: .6rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .section-label::before {
+    content: '';
+    width: 16px; height: 1px;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  h2 {
+    font-family: var(--sans);
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-weight: 700;
+    color: var(--white);
+    font-size: 1rem;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+    margin-bottom: 3rem;
+  }
+
+  /* ── ABOUT ── */
+  #about .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+    margin-top: 3rem;
+  }
+
+  .about-text p {
+    color: var(--text-mid);
+    font-size: 13.5px;
+    line-height: 1.9;
+    margin-bottom: 1rem;
+  }
+
+  .about-text strong { color: var(--accent); font-weight: 500; }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .stat-box {
+    background: var(--bg2);
+    padding: 1.5rem;
+    transition: background .2s;
+  }
+  .stat-box:hover { background: var(--bg3); }
+
+  .stat-num {
+    font-family: var(--sans);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: .3rem;
+  }
+  .stat-num span { color: var(--accent); }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  /* ── SKILLS ── */
+  #skills { background: var(--bg2); }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .skill-category {
+    background: var(--bg);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background .2s;
+  }
+  .skill-category:hover { background: var(--bg3); }
+
+  .skill-category::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform .3s;
+    transform-origin: bottom;
+  }
+  .skill-category:hover::before { transform: scaleY(1); }
+
+  .skill-cat-title {
+    font-size: 10px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+    font-weight: 600;
+  }
+
+  .skill-tags {
+    display: flex; flex-wrap: wrap; gap: .4rem;
+  }
+
+  .skill-tag {
+    font-size: 11px;
+    padding: .25rem .55rem;
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    border-radius: 2px;
+    transition: all .15s;
+  }
+  .skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+  .skill-tag.highlight {
+    border-color: rgba(0,212,255,0.4);
+    color: var(--accent);
+    background: rgba(0,212,255,0.05);
+  }
+
+  /* ── PROJECTS ── */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .project-card {
+    background: var(--bg2);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: background .2s;
+  }
+  .project-card:hover { background: var(--bg3); }
+
+  .project-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .3s;
+  }
+  .project-card:hover::after { transform: scaleX(1); }
+
+  .project-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .project-num {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: .1em;
+  }
+
+  .project-tag {
+    font-size: 10px;
+    padding: .2rem .5rem;
+    border-radius: 2px;
+    letter-spacing: .05em;
+    font-weight: 600;
+  }
+  .tag-siem    { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
+  .tag-pentest { background: rgba(255,107,53,0.1); color: var(--accent3); border: 1px solid rgba(255,107,53,0.2); }
+  .tag-network { background: rgba(0,229,160,0.1); color: var(--green); border: 1px solid rgba(0,229,160,0.2); }
+  .tag-research{ background: rgba(180,130,255,0.1); color: #c099ff; border: 1px solid rgba(180,130,255,0.2); }
+  .tag-wip     { background: rgba(255,215,0,0.1); color: #ffd700; border: 1px solid rgba(255,215,0,0.2); }
+
+  .project-title {
+    font-family: var(--sans);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: .7rem;
+    line-height: 1.3;
+  }
+
+  .project-desc {
+    font-size: 12.5px;
+    color: var(--text-mid);
+    line-height: 1.8;
+    margin-bottom: 1.2rem;
+  }
+
+  .project-stack {
+    display: flex; flex-wrap: wrap; gap: .3rem;
+  }
+
+  .stack-item {
+    font-size: 10px;
+    padding: .15rem .45rem;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ── EDUCATION ── */
+  #education { background: var(--bg2); }
+
+  .edu-timeline {
+    margin-top: 3rem;
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .edu-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 1px;
+    background: linear-gradient(180deg, var(--accent), var(--border));
+  }
+
+  .edu-item {
+    position: relative;
+    margin-bottom: 3rem;
+    padding-left: 1.5rem;
+  }
+
+  .edu-item::before {
+    content: '';
+    position: absolute;
+    left: -2.3rem; top: 8px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px rgba(0,212,255,0.6);
+  }
+
+  .edu-date {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .08em;
+    margin-bottom: .3rem;
+  }
+
+  .edu-degree {
+    font-family: var(--sans);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: .2rem;
+  }
+
+  .edu-school {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: .6rem;
+  }
+
+  .edu-detail {
+    font-size: 12.5px;
+    color: var(--text-mid);
+    line-height: 1.8;
+    border-left: 2px solid var(--border);
+    padding-left: 1rem;
+    margin-top: .5rem;
+  }
+
+  /* ── CERTS ── */
+  .certs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .cert-card {
+    background: var(--bg);
+    padding: 1.5rem 2rem;
+    display: flex; align-items: center; gap: 1.2rem;
+    transition: background .2s;
+  }
+  .cert-card:hover { background: var(--bg3); }
+
+  .cert-icon {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    background: var(--bg2);
+  }
+
+  .cert-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: .2rem;
+  }
+
+  .cert-status {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: .06em;
+  }
+  .cert-status.active { color: var(--green); }
+  .cert-status.pending { color: #ffd700; }
+
+  /* ── CONTACT ── */
+  #contact {
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-glow {
+    position: absolute;
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse, rgba(0,212,255,0.04) 0%, transparent 70%);
+    left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    pointer-events: none;
+  }
+
+  #contact .content { position: relative; z-index: 1; }
+
+  #contact p {
+    color: var(--text-mid);
+    max-width: 500px;
+    margin: 1rem auto 2.5rem;
+    font-size: 13.5px;
+    line-height: 1.9;
+  }
+
+  .contact-links {
+    display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .contact-link {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .65rem 1.3rem;
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: .05em;
+    border-radius: 2px;
+    transition: all .2s;
+  }
+  .contact-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,255,0.05);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem clamp(1.5rem,5vw,4rem);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* ── TYPEWRITER ── */
+  .typewriter {
+    border-right: 2px solid var(--accent);
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 2.5s steps(40,end) forwards, blink .8s step-end infinite;
+    display: inline-block;
+    max-width: 100%;
+  }
+  @keyframes typing { from{ width:0 } to{ width:100% } }
+  @keyframes blink  { 50%{ border-color: transparent } }
+
+  /* ── FADE IN ── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    #about .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .about-stats { grid-template-columns: 1fr 1fr; }
+    nav .nav-links { display: none; }
+    .terminal-status { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a class="nav-logo" href="#hero">jar<span>obledo</span><span style="color:var(--accent)">@sec</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#projects">proyectos</a></li>
+    <li><a href="#education">formación</a></li>
+    <li><a href="#contact">contacto</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-label">Ciberseguridad · Telecomunicaciones · Detección de Amenazas</div>
+    <h1>Juan Antonio<br><span class="dim">Robledo</span></h1>
+    <div class="hero-sub">
+      <span class="typewriter">Security Analyst & Telecom Engineer</span>
+    </div>
+    <p class="hero-desc">
+      Estudiante de Máster en Ciberseguridad (US) y Máster en Ingeniería de Telecomunicación (UNIR).
+      Especializado en monitorización SIEM, detección de intrusiones HIDS/NIDS
+      y la metodología MITRE ATT&amp;CK. Busco prácticas en entornos de ciberseguridad activa.
+    </p>
+    <div class="hero-badges">
+      <span class="badge active">SIEM · Wazuh · Splunk</span>
+      <span class="badge active">MITRE ATT&amp;CK</span>
+      <span class="badge active">HIDS / NIDS</span>
+      <span class="badge">Pentesting</span>
+      <span class="badge">IPv4 / IPv6</span>
+      <span class="badge">Python · Bash</span>
+      <span class="badge">Inglés C1</span>
+    </div>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="CV_JuanAntonio_Robledo.pdf" download>
+        ↓ Descargar CV
+      </a>
+      <a class="btn btn-ghost" href="#projects">Ver proyectos →</a>
+      <a class="btn btn-ghost" href="#contact">Contacto</a>
+    </div>
+  </div>
+
+  <div class="terminal-status">
+    <div class="status-line"><span class="dot dot-green"></span> Disponible para prácticas</div>
+    <div class="status-line" style="margin-top:.3rem"><span class="dot dot-blue"></span> Incorporación: verano 2026</div>
+    <div class="status-line" style="margin-top:.3rem"><span class="dot dot-yellow"></span> TFM en curso — MITRE ATT&amp;CK / HIDS</div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="section-label">01 / about</div>
+  <h2>Sobre mí</h2>
+  <div class="divider"></div>
+  <div class="about-grid fade-up">
+    <div class="about-text">
+      <p>
+        Soy ingeniero de telecomunicaciones (especialidad telemática) graduado con un
+        <strong>TFG calificado con 10/10</strong> sobre seguridad en IPv6 con Secure Neighbor Discovery.
+        Actualmente curso de forma simultánea el <strong>Máster en Ciberseguridad en la Universidad de Sevilla</strong>
+        y el <strong>Máster en Ingeniería de Telecomunicación en la UNIR</strong>.
+      </p>
+      <p>
+        Mi Trabajo Fin de Máster analiza la capacidad de detección de ataques en red de la
+        <strong>matriz MITRE ATT&amp;CK Enterprise mediante HIDS</strong>, lo que me ha llevado a
+        desplegar y configurar activamente plataformas como Wazuh, OSSEC, Samhain y VelociRaptor
+        en entornos virtualizados.
+      </p>
+      <p>
+        Mi formación en telecomunicaciones no es un detalle menor en ciberseguridad: comprender
+        en profundidad los protocolos sobre los que se asientan las amenazas — BGP, MPLS, IPSec,
+        IPv6 — me permite interpretar una alerta de red desde la capa de red hacia arriba.
+      </p>
+    </div>
+    <div class="about-stats">
+      <div class="stat-box">
+        <div class="stat-num">10<span>/10</span></div>
+        <div class="stat-label">Nota TFG IPv6/SeND</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">2<span>+</span></div>
+        <div class="stat-label">Másteres simultáneos</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">5<span>+</span></div>
+        <div class="stat-label">SIEMs y HIDS/NIDS</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">C<span>1</span></div>
+        <div class="stat-label">Inglés avanzado</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SKILLS ── -->
+<section id="skills">
+  <div class="section-label">02 / skills</div>
+  <h2>Habilidades técnicas</h2>
+  <div class="divider"></div>
+  <div class="skills-grid fade-up">
+    <div class="skill-category">
+      <div class="skill-cat-title">📡 Monitorización & Detección</div>
+      <div class="skill-tags">
+        <span class="skill-tag highlight">Wazuh</span>
+        <span class="skill-tag highlight">Splunk</span>
+        <span class="skill-tag highlight">Sagan</span>
+        <span class="skill-tag highlight">MITRE ATT&amp;CK</span>
+        <span class="skill-tag">OSSEC</span>
+        <span class="skill-tag">Samhain</span>
+        <span class="skill-tag">VelociRaptor</span>
+        <span class="skill-tag">Snort</span>
+        <span class="skill-tag">Análisis de logs</span>
+        <span class="skill-tag">Correlación de eventos</span>
+      </div>
+    </div>
+    <div class="skill-category">
+      <div class="skill-cat-title">🔴 Seguridad Ofensiva</div>
+      <div class="skill-tags">
+        <span class="skill-tag highlight">Metasploit</span>
+        <span class="skill-tag highlight">Burp Suite</span>
+        <span class="skill-tag highlight">Nmap</span>
+        <span class="skill-tag highlight">Wireshark</span>
+        <span class="skill-tag">Pentesting</span>
+        <span class="skill-tag">Análisis forense</span>
+        <span class="skill-tag">CTF</span>
+        <span class="skill-tag">Bastionado Linux</span>
+      </div>
+    </div>
+    <div class="skill-category">
+      <div class="skill-cat-title">🌐 Redes & Telecomunicaciones</div>
+      <div class="skill-tags">
+        <span class="skill-tag highlight">IPv4 / IPv6</span>
+        <span class="skill-tag highlight">IPSec / VPN</span>
+        <span class="skill-tag">BGP / OSPF</span>
+        <span class="skill-tag">MPLS L2/L3VPN</span>
+        <span class="skill-tag">TCP/UDP</span>
+        <span class="skill-tag">VLAN / 802.1X</span>
+        <span class="skill-tag">SNMP</span>
+        <span class="skill-tag">GNS3 / EVE-NG</span>
+      </div>
+    </div>
+    <div class="skill-category">
+      <div class="skill-cat-title">⚙️ Sistemas & Scripting</div>
+      <div class="skill-tags">
+        <span class="skill-tag highlight">Linux</span>
+        <span class="skill-tag highlight">Python</span>
+        <span class="skill-tag highlight">Bash</span>
+        <span class="skill-tag">C</span>
+        <span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">Java</span>
+        <span class="skill-tag">Apache / Tomcat</span>
+        <span class="skill-tag">Firewalls</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROJECTS ── -->
+<section id="projects">
+  <div class="section-label">03 / proyectos</div>
+  <h2>Proyectos destacados</h2>
+  <div class="divider"></div>
+  <div class="projects-grid fade-up">
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-num">001</span>
+        <span class="project-tag tag-wip">EN CURSO</span>
+      </div>
+      <div class="project-title">TFM — MITRE ATT&amp;CK & HIDS en Red</div>
+      <p class="project-desc">
+        Análisis de la capacidad de detección de ataques en red de la matriz MITRE ATT&amp;CK
+        Enterprise mediante sistemas HIDS. Despliegue activo en laboratorio virtualizado:
+        configuración de agentes, reglas personalizadas, correlación de eventos y validación
+        contra técnicas documentadas en ATT&amp;CK.
+      </p>
+      <div class="project-stack">
+        <span class="stack-item">Wazuh</span>
+        <span class="stack-item">OSSEC</span>
+        <span class="stack-item">Samhain</span>
+        <span class="stack-item">VelociRaptor</span>
+        <span class="stack-item">MITRE ATT&amp;CK</span>
+        <span class="stack-item">EVE-NG</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-num">002</span>
+        <span class="project-tag tag-siem">SIEM</span>
+      </div>
+      <div class="project-title">Detección de Breach con SIEM — Wazuh</div>
+      <p class="project-desc">
+        Monitorización y análisis de logs en entorno de laboratorio, detección de intrusiones
+        y generación de alertas mediante Wazuh. Integración de agentes HIDS, configuración de
+        reglas personalizadas y correlación de eventos de seguridad en tiempo real.
+      </p>
+      <div class="project-stack">
+        <span class="stack-item">Wazuh</span>
+        <span class="stack-item">Splunk</span>
+        <span class="stack-item">Linux</span>
+        <span class="stack-item">Análisis de logs</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-num">003</span>
+        <span class="project-tag tag-pentest">PENTEST</span>
+      </div>
+      <div class="project-title">CTF — Análisis Forense de Seguridad</div>
+      <p class="project-desc">
+        Ejercicio Capture the Flag en el marco del Máster en Ciberseguridad (US). Identificación
+        y explotación de vulnerabilidades en entorno controlado, con elaboración de informe
+        técnico completo de seguridad: hallazgos, vectores de ataque y recomendaciones de remediación.
+      </p>
+      <div class="project-stack">
+        <span class="stack-item">Metasploit</span>
+        <span class="stack-item">Burp Suite</span>
+        <span class="stack-item">Nmap</span>
+        <span class="stack-item">Informe forense</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-num">004</span>
+        <span class="project-tag tag-network">NAC</span>
+      </div>
+      <div class="project-title">Hotspot BYOD con NAC Empresarial</div>
+      <p class="project-desc">
+        Diseño e implementación de sistema de control de acceso a red con autenticación 802.1X/MAB,
+        portal cautivo, gestión de VLAN y roles, integrando PacketFence, switches Cisco y
+        Active Directory. Simulación de entorno empresarial real.
+      </p>
+      <div class="project-stack">
+        <span class="stack-item">PacketFence</span>
+        <span class="stack-item">802.1X / MAB</span>
+        <span class="stack-item">Cisco Switches</span>
+        <span class="stack-item">Active Directory</span>
+        <span class="stack-item">VLAN</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-num">005</span>
+        <span class="project-tag tag-network">VPN</span>
+      </div>
+      <div class="project-title">VPN SSL/TLS — Seguridad Criptográfica</div>
+      <p class="project-desc">
+        Configuración de VPN Host-to-Host y cliente-servidor con OpenVPN. Pruebas de seguridad
+        criptográfica, análisis de resistencia ante ataques DoS y verificación de integridad
+        del canal cifrado.
+      </p>
+      <div class="project-stack">
+        <span class="stack-item">OpenVPN</span>
+        <span class="stack-item">SSL/TLS</span>
+        <span class="stack-item">IPSec</span>
+        <span class="stack-item">Wireshark</span>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-num">006</span>
+        <span class="project-tag tag-research">INVESTIGACIÓN</span>
+      </div>
+      <div class="project-title">TFG — IPv6 con Secure Neighbor Discovery (SeND)</div>
+      <p class="project-desc">
+        Desarrollo de un entorno de pruebas completo para IPv6 con el protocolo SeND.
+        Implementación, validación de seguridad y análisis de comportamiento del protocolo
+        frente a ataques de capa de enlace. Calificación: <strong style="color:var(--accent)">10 / 10</strong>.
+      </p>
+      <div class="project-stack">
+        <span class="stack-item">IPv6</span>
+        <span class="stack-item">SeND</span>
+        <span class="stack-item">GNS3</span>
+        <span class="stack-item">Linux</span>
+        <span class="stack-item">Wireshark</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── EDUCATION ── -->
+<section id="education">
+  <div class="section-label">04 / formación</div>
+  <h2>Educación & Certificaciones</h2>
+  <div class="divider"></div>
+
+  <div class="edu-timeline fade-up">
+    <div class="edu-item">
+      <div class="edu-date">Nov 2025 — Feb 2027</div>
+      <div class="edu-degree">Máster en Ingeniería de Telecomunicación (Habilitante)</div>
+      <div class="edu-school">Universidad Internacional de La Rioja (UNIR)</div>
+    </div>
+    <div class="edu-item">
+      <div class="edu-date">Oct 2025 — Ago 2026</div>
+      <div class="edu-degree">Máster en Ciberseguridad</div>
+      <div class="edu-school">Universidad de Sevilla</div>
+      <div class="edu-detail">
+        TFM: Análisis de la capacidad de detección de ataques en red de la matriz MITRE ATT&amp;CK
+        Enterprise mediante HIDS — despliegue activo de Wazuh, OSSEC, Samhain y VelociRaptor.
+      </div>
+    </div>
+    <div class="edu-item">
+      <div class="edu-date">Sep 2020 — Jul 2025</div>
+      <div class="edu-degree">Grado en Ingeniería de las Tecnologías de Telecomunicación (Telemática)</div>
+      <div class="edu-school">Universidad de Sevilla</div>
+      <div class="edu-detail">
+        TFG: Desarrollo de un entorno de pruebas de IPv6 con Secure Neighbor Discovery (SeND).
+        Calificación: <strong style="color:var(--accent)">10 / 10</strong>.
+      </div>
+    </div>
+  </div>
+
+  <div class="certs-grid fade-up" style="margin-top:3rem">
+    <div class="cert-card">
+      <div class="cert-icon">🛡️</div>
+      <div>
+        <div class="cert-name">Prevención de Riesgos Laborales</div>
+        <div class="cert-status active">✓ Certificado — Nivel Básico</div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">⚔️</div>
+      <div>
+        <div class="cert-name">OSCP+ — Offensive Security Certified Professional+</div>
+        <div class="cert-status pending">⏳ En preparación — finales de 2026</div>
+      </div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🌐</div>
+      <div>
+        <div class="cert-name">Inglés — Nivel C1 Avanzado</div>
+        <div class="cert-status active">✓ Verificado</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact">
+  <div class="contact-glow"></div>
+  <div class="content fade-up">
+    <div class="section-label" style="justify-content:center">05 / contacto</div>
+    <h2>Hablemos</h2>
+    <p>
+      Busco prácticas en ciberseguridad o telecomunicaciones mediante convenio universitario (UNIR),
+      con incorporación prevista en el verano de 2026. Abierto a proyectos, colaboraciones
+      o simplemente a intercambiar ideas sobre detección de amenazas.
+    </p>
+    <a class="btn btn-primary" href="mailto:juanrobledomenendez@gmail.com" style="margin:0 auto;display:inline-flex;">
+      ✉ juanrobledomenendez@gmail.com
+    </a>
+    <div class="contact-links">
+      <a class="contact-link" href="https://linkedin.com/in/juanantoniorobledo" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a class="contact-link" href="https://github.com/jarobledo-sec" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+      <a class="contact-link" href="tel:+34615789858">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>
+        +34 615 789 858
+      </a>
+      <a class="contact-link" href="CV_JuanAntonio_Robledo.pdf" download>
+        ↓ CV en PDF
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <span>Juan Antonio Robledo Menéndez · 2026</span>
+  <span style="color:var(--accent);font-size:10px;letter-spacing:.1em">SECURITY · TELECOM · DETECTION</span>
+</footer>
+
+<script>
+  // Fade-up on scroll
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Typewriter restart on hover
+  const tw = document.querySelector('.typewriter');
+  if (tw) {
+    tw.addEventListener('animationend', () => {
+      setTimeout(() => {
+        tw.style.animation = 'none';
+        tw.offsetHeight; // reflow
+        tw.style.animation = '';
+      }, 4000);
+    });
+  }
+</script>
+
+</body>
+</html>
