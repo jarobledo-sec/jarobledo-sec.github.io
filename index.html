@@ -53,7 +53,6 @@
     z-index: 9999;
   }
 
-  /* ── NOISE TEXTURE ── */
   body::after {
     content: '';
     position: fixed; inset: 0;
@@ -63,7 +62,6 @@
     opacity: .4;
   }
 
-  /* ── NAV ── */
   nav {
     position: fixed; top: 0; left: 0; right: 0;
     z-index: 100;
@@ -100,7 +98,6 @@
   }
   .nav-links a:hover { color: var(--accent); }
 
-  /* ── HERO ── */
   #hero {
     min-height: 100vh;
     display: flex; align-items: center;
@@ -221,7 +218,6 @@
   }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── TERMINAL STATUS ── */
   .terminal-status {
     position: absolute;
     bottom: 3rem; right: clamp(1.5rem, 5vw, 4rem);
@@ -237,7 +233,6 @@
 
   @keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:.4 } }
 
-  /* ── SECTIONS ── */
   section { padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,4rem); }
 
   .section-label {
@@ -328,7 +323,6 @@
     text-transform: uppercase;
   }
 
-  /* ── SKILLS ── */
   #skills { background: var(--bg2); }
 
   .skills-grid {
@@ -338,6 +332,11 @@
     background: var(--border);
     border: 1px solid var(--border);
     margin-top: 3rem;
+  }
+  
+  .btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
   }
 
   .skill-category {
@@ -389,7 +388,6 @@
     background: rgba(0,212,255,0.05);
   }
 
-  /* ── PROJECTS ── */
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -474,7 +472,6 @@
     border: 1px solid rgba(255,255,255,0.06);
   }
 
-  /* ── EDUCATION ── */
   #education { background: var(--bg2); }
 
   .edu-timeline {
@@ -537,7 +534,6 @@
     margin-top: .5rem;
   }
 
-  /* ── CERTS ── */
   .certs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -579,7 +575,6 @@
   .cert-status.active { color: var(--green); }
   .cert-status.pending { color: #ffd700; }
 
-  /* ── CONTACT ── */
   #contact {
     text-align: center;
     position: relative;
@@ -627,7 +622,6 @@
     background: rgba(0,212,255,0.05);
   }
 
-  /* ── FOOTER ── */
   footer {
     border-top: 1px solid var(--border);
     padding: 1.5rem clamp(1.5rem,5vw,4rem);
@@ -636,7 +630,6 @@
     color: var(--text-dim);
   }
 
-  /* ── TYPEWRITER ── */
   .typewriter {
     border-right: 2px solid var(--accent);
     white-space: nowrap;
@@ -648,7 +641,6 @@
   @keyframes typing { from{ width:0 } to{ width:100% } }
   @keyframes blink  { 50%{ border-color: transparent } }
 
-  /* ── FADE IN ── */
   .fade-up {
     opacity: 0;
     transform: translateY(24px);
@@ -656,7 +648,6 @@
   }
   .fade-up.visible { opacity: 1; transform: translateY(0); }
 
-  /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
     #about .about-grid { grid-template-columns: 1fr; gap: 2rem; }
     .about-stats { grid-template-columns: 1fr 1fr; }
@@ -667,7 +658,6 @@
 </head>
 <body>
 
-<!-- ── NAV ── -->
 <nav>
   <a class="nav-logo" href="#hero">jar<span>obledo</span><span style="color:var(--accent)">@sec</span></a>
   <ul class="nav-links">
@@ -679,7 +669,6 @@
   </ul>
 </nav>
 
-<!-- ── HERO ── -->
 <section id="hero">
   <div class="hero-grid-bg"></div>
   <div class="hero-glow"></div>
@@ -719,7 +708,6 @@
   </div>
 </section>
 
-<!-- ── ABOUT ── -->
 <section id="about">
   <div class="section-label">01 / about</div>
   <h2>Sobre mí</h2>
@@ -765,7 +753,6 @@
   </div>
 </section>
 
-<!-- ── SKILLS ── -->
 <section id="skills">
   <div class="section-label">02 / skills</div>
   <h2>Habilidades técnicas</h2>
@@ -828,7 +815,6 @@
   </div>
 </section>
 
-<!-- ── PROJECTS ── -->
 <section id="projects">
   <div class="section-label">03 / proyectos</div>
   <h2>Proyectos destacados</h2>
@@ -855,6 +841,11 @@
         <span class="stack-item">MITRE ATT&amp;CK</span>
         <span class="stack-item">EVE-NG</span>
       </div>
+            <div style="margin-top:1.2rem;">
+      <a href="#" class="btn btn-ghost disabled" style="font-size:11px;">
+Informe técnico (próximamente)
+	</a>
+	</div>
     </div>
 
     <div class="project-card">
@@ -874,6 +865,11 @@
         <span class="stack-item">Linux</span>
         <span class="stack-item">Análisis de logs</span>
       </div>
+      <div style="margin-top:1.2rem;">
+      <a href="#" class="btn btn-ghost disabled" style="font-size:11px;">
+Informe técnico (próximamente)
+	</a>
+	</div>
     </div>
 
     <div class="project-card">
@@ -893,6 +889,11 @@
         <span class="stack-item">Nmap</span>
         <span class="stack-item">Informe forense</span>
       </div>
+        <div style="margin-top:1.2rem;">
+    <a href="CTF.pdf" download class="btn btn-ghost" style="font-size:11px;">
+      ↓ Ver informe técnico
+    </a>
+  </div>
     </div>
 
     <div class="project-card">
@@ -913,6 +914,11 @@
         <span class="stack-item">Active Directory</span>
         <span class="stack-item">VLAN</span>
       </div>
+        <div style="margin-top:1.2rem;">
+    <a href="PacketFence.pdf" download class="btn btn-ghost" style="font-size:11px;">
+      ↓ Ver informe técnico
+    </a>
+  </div>
     </div>
 
     <div class="project-card">
@@ -932,6 +938,11 @@
         <span class="stack-item">IPSec</span>
         <span class="stack-item">Wireshark</span>
       </div>
+        <div style="margin-top:1.2rem;">
+    <a href="VPN.pdf" download class="btn btn-ghost" style="font-size:11px;">
+      ↓ Ver informe técnico
+    </a>
+  </div>
     </div>
 
     <div class="project-card">
@@ -952,12 +963,50 @@
         <span class="stack-item">Linux</span>
         <span class="stack-item">Wireshark</span>
       </div>
+        <div style="margin-top:1.2rem;">
+    <a href="ipv6_send.pdf" download class="btn btn-ghost" style="font-size:11px;">
+      ↓ Ver informe técnico
+    </a>
+  </div>
     </div>
+<div class="project-card">
+  <div class="project-header">
+    <span class="project-num">007</span>
+    <span class="project-tag tag-siem">SIEM</span>
+  </div>
 
+  <div class="project-title">
+    Seguridad en Redes LAN — Detección y Análisis de Ataques
+  </div>
+
+  <p class="project-desc">
+    Desarrollo de un laboratorio de ciberseguridad enfocado en el análisis de vulnerabilidades
+    en redes LAN y la detección de ataques en tiempo real. Simulación de técnicas ofensivas
+    a nivel de capa 2 y 3, incluyendo MAC Flooding, MAC Spoofing, ARP Spoofing,
+    DHCP Starvation y ataques WiFi.
+    <br><br>
+    Implementación de contramedidas en infraestructura de red como Port Security,
+    DHCP Snooping y ARP Protection, junto con monitorización mediante sistemas SIEM
+    para la generación de alertas y correlación de eventos de seguridad.
+  </p>
+
+  <div class="project-stack">
+    <span class="stack-item">SNMP</span>
+    <span class="stack-item">Wireshark</span>
+    <span class="stack-item">DHCP</span>
+    <span class="stack-item">Cisco Switch</span>
+    <span class="stack-item">Wifi</span>
+  </div>
+
+  <div style="margin-top:1.2rem;">
+    <a href="seguridad_LAN.pdf" download class="btn btn-ghost" style="font-size:11px;">
+      ↓ Ver informe técnico
+    </a>
+  </div>
+</div>
   </div>
 </section>
 
-<!-- ── EDUCATION ── -->
 <section id="education">
   <div class="section-label">04 / formación</div>
   <h2>Educación & Certificaciones</h2>
@@ -1014,7 +1063,6 @@
   </div>
 </section>
 
-<!-- ── CONTACT ── -->
 <section id="contact">
   <div class="contact-glow"></div>
   <div class="content fade-up">
@@ -1048,14 +1096,13 @@
   </div>
 </section>
 
-<!-- ── FOOTER ── -->
 <footer>
   <span>Juan Antonio Robledo Menéndez · 2026</span>
   <span style="color:var(--accent);font-size:10px;letter-spacing:.1em">SECURITY · TELECOM · DETECTION</span>
 </footer>
 
 <script>
-  // Fade-up on scroll
+
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -1067,7 +1114,6 @@
 
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-  // Typewriter restart on hover
   const tw = document.querySelector('.typewriter');
   if (tw) {
     tw.addEventListener('animationend', () => {
@@ -1082,3 +1128,4 @@
 
 </body>
 </html>
+
