@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juan Antonio Robledo — Security Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #06080b;
+    --bg2:       #0b0e14;
+    --bg3:       #10141c;
+    --border:    #1a2435;
+    --border2:   #243040;
+    --accent:    #00e5ff;
+    --accent2:   #005577;
+    --accent3:   #ff5533;
+    --accent4:   #00d4a0;
+    --text:      #bbd0e0;
+    --text-dim:  #4a6680;
+    --text-mid:  #7a9ab5;
+    --white:     #eaf4ff;
+    --green:     #00d4a0;
+    --orange:    #ff7744;
+    --mono:      'Space Mono', monospace;
+    --sans:      'Outfit', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  /* CRT scanlines */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(0,229,255,0.008) 3px, rgba(0,229,255,0.008) 4px
+    );
+    pointer-events: none; z-index: 9999;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(1.5rem, 5vw, 5rem);
+    height: 56px;
+    background: rgba(6,8,11,0.9);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+  }
+  .nav-logo .dim { color: var(--text-dim); font-weight: 400; }
+
+  .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+  .nav-links a {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 80px clamp(1.5rem, 5vw, 5rem) 0;
+    position: relative; overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 70% 70% at 15% 50%, black 0%, transparent 75%);
+  }
+
+  .hero-orb {
+    position: absolute;
+    width: 700px; height: 700px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,229,255,0.055) 0%, transparent 65%);
+    top: -15%; left: -20%; pointer-events: none;
+  }
+  .hero-orb2 {
+    position: absolute;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,212,160,0.04) 0%, transparent 70%);
+    bottom: 10%; right: 5%; pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 860px; }
+
+  .hero-eyebrow {
+    font-size: 10px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.8rem;
+    display: flex; align-items: center; gap: .8rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block; width: 28px; height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--sans);
+    font-weight: 900;
+    font-size: clamp(3rem, 7.5vw, 6.2rem);
+    color: var(--white);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.4rem;
+  }
+  h1 .line2 {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--border2);
+    display: block;
+  }
+
+  .hero-title-accent {
+    font-family: var(--sans);
+    font-size: clamp(1rem, 2.8vw, 1.5rem);
+    font-weight: 600;
+    color: var(--accent);
+    margin: 1.4rem 0 1.8rem;
+    letter-spacing: 0.01em;
+  }
+
+  .hero-pitch {
+    max-width: 580px;
+    color: var(--text-mid);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.95;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-pitch strong { color: var(--text); font-weight: 700; }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 2.5rem; }
+  .badge {
+    font-size: 10px;
+    padding: .28rem .65rem;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+    transition: all .2s;
+    cursor: default;
+  }
+  .badge:hover { border-color: var(--accent); color: var(--accent); }
+  .badge.hi { border-color: rgba(0,229,255,0.35); color: var(--accent); background: rgba(0,229,255,0.04); }
+
+  .cta-row { display: flex; gap: .9rem; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .6rem 1.35rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all .18s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary { background: var(--accent); color: var(--bg); font-weight: 700; }
+  .btn-primary:hover { background: #33eeff; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(0,229,255,0.22); }
+  .btn-ghost { border: 1px solid var(--border); color: var(--text-mid); background: transparent; }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.disabled { opacity: .4; pointer-events: none; }
+
+  .terminal-panel {
+    position: absolute;
+    bottom: 3.5rem; right: clamp(1.5rem, 5vw, 5rem);
+    font-size: 10.5px;
+    color: var(--text-dim);
+    text-align: right;
+    line-height: 1.6;
+  }
+  .t-line { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
+  .t-line + .t-line { margin-top: .25rem; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .dot-g { background: var(--green); box-shadow: 0 0 7px var(--green); animation: blink 2s infinite; }
+  .dot-b { background: var(--accent); }
+  .dot-y { background: #ffd700; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* ── SECTIONS ── */
+  section { padding: clamp(4.5rem,9vw,7.5rem) clamp(1.5rem,5vw,5rem); }
+
+  .sec-label {
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: .5rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .sec-label::before { content: ''; width: 18px; height: 1px; background: var(--accent); display: inline-block; }
+
+  h2 {
+    font-family: var(--sans);
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: .9rem;
+    letter-spacing: -0.02em;
+  }
+  h3 { font-family: var(--sans); font-weight: 700; color: var(--white); font-size: 1rem; }
+
+  .hr { height: 1px; background: linear-gradient(90deg, var(--border2), transparent); margin-bottom: 3rem; }
+
+  /* ── ABOUT ── */
+  #about .grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: start; margin-top: 3rem;
+  }
+  .about-text p { color: var(--text-mid); font-size: 13px; line-height: 1.95; margin-bottom: 1rem; }
+  .about-text strong { color: var(--accent); font-weight: 700; }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .stat-box { background: var(--bg2); padding: 1.6rem; transition: background .2s; }
+  .stat-box:hover { background: var(--bg3); }
+  .stat-n { font-family: var(--sans); font-size: 2.1rem; font-weight: 900; color: var(--white); line-height: 1; margin-bottom: .3rem; }
+  .stat-n span { color: var(--accent); }
+  .stat-lbl { font-size: 10px; color: var(--text-dim); letter-spacing: .09em; text-transform: uppercase; }
+
+  /* ── WHY BENDING SPOONS ── */
+  #why { background: var(--bg2); }
+  .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 3rem; }
+  .why-card { background: var(--bg); padding: 2rem; position: relative; overflow: hidden; transition: background .2s; }
+  .why-card:hover { background: var(--bg3); }
+  .why-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+  .why-card:hover::before { transform: scaleX(1); }
+  .why-icon { font-size: 1.4rem; margin-bottom: 1rem; }
+  .why-title { font-family: var(--sans); font-weight: 700; color: var(--white); font-size: .95rem; margin-bottom: .5rem; }
+  .why-desc { font-size: 12px; color: var(--text-mid); line-height: 1.85; }
+
+  /* ── SKILLS ── */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 3rem; }
+  .skill-cat { background: var(--bg2); padding: 1.8rem 2rem; position: relative; overflow: hidden; transition: background .2s; }
+  .skill-cat:hover { background: var(--bg3); }
+  .skill-cat::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); transform: scaleY(0); transform-origin: bottom; transition: transform .3s; }
+  .skill-cat:hover::before { transform: scaleY(1); }
+  .skill-cat-title { font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.2rem; font-weight: 700; }
+  .tags { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .tag { font-size: 10.5px; padding: .22rem .52rem; border: 1px solid var(--border); color: var(--text-mid); border-radius: 2px; transition: all .15s; }
+  .tag:hover { border-color: var(--accent); color: var(--accent); }
+  .tag.hi { border-color: rgba(0,229,255,0.4); color: var(--accent); background: rgba(0,229,255,0.04); }
+
+  /* ── PROJECTS ── */
+  .proj-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 3rem; }
+  .proj-card { background: var(--bg2); padding: 2rem; position: relative; overflow: hidden; transition: background .2s; }
+  .proj-card:hover { background: var(--bg3); }
+  .proj-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+  .proj-card:hover::after { transform: scaleX(1); }
+  .proj-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: .9rem; }
+  .proj-num { font-size: 9.5px; color: var(--text-dim); letter-spacing: .1em; }
+  .ptag { font-size: 9.5px; padding: .18rem .5rem; border-radius: 2px; letter-spacing: .05em; font-weight: 700; }
+  .ptag-siem    { background: rgba(0,229,255,0.08); color: var(--accent); border: 1px solid rgba(0,229,255,0.2); }
+  .ptag-pentest { background: rgba(255,85,51,0.08); color: var(--orange); border: 1px solid rgba(255,85,51,0.2); }
+  .ptag-net     { background: rgba(0,212,160,0.08); color: var(--green); border: 1px solid rgba(0,212,160,0.2); }
+  .ptag-research{ background: rgba(180,130,255,0.08); color: #bb99ff; border: 1px solid rgba(180,130,255,0.2); }
+  .ptag-wip     { background: rgba(255,215,0,0.08); color: #ffd700; border: 1px solid rgba(255,215,0,0.2); }
+  .proj-title { font-family: var(--sans); font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .6rem; line-height: 1.3; }
+  .proj-desc { font-size: 12px; color: var(--text-mid); line-height: 1.85; margin-bottom: 1.1rem; }
+  .stack { display: flex; flex-wrap: wrap; gap: .28rem; }
+  .st { font-size: 9.5px; padding: .14rem .42rem; background: rgba(255,255,255,0.03); color: var(--text-dim); border-radius: 2px; border: 1px solid rgba(255,255,255,0.06); }
+
+  /* ── EDUCATION ── */
+  #education { background: var(--bg2); }
+  .edu-line { margin-top: 3rem; position: relative; padding-left: 2rem; }
+  .edu-line::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(180deg, var(--accent), var(--border)); }
+  .edu-item { position: relative; margin-bottom: 3rem; padding-left: 1.5rem; }
+  .edu-item::before { content: ''; position: absolute; left: -2.3rem; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px rgba(0,229,255,0.5); }
+  .edu-date { font-size: 10.5px; color: var(--accent); letter-spacing: .07em; margin-bottom: .3rem; }
+  .edu-degree { font-family: var(--sans); font-size: 1.05rem; font-weight: 700; color: var(--white); margin-bottom: .2rem; }
+  .edu-school { font-size: 11.5px; color: var(--text-dim); margin-bottom: .5rem; }
+  .edu-detail { font-size: 12px; color: var(--text-mid); line-height: 1.85; border-left: 2px solid var(--border); padding-left: 1rem; margin-top: .5rem; }
+  .edu-detail strong { color: var(--accent); }
+
+  .certs { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 3rem; }
+  .cert { background: var(--bg); padding: 1.4rem 1.8rem; display: flex; align-items: center; gap: 1.1rem; transition: background .2s; }
+  .cert:hover { background: var(--bg3); }
+  .cert-ico { width: 34px; height: 34px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; background: var(--bg2); }
+  .cert-name { font-size: 12px; font-weight: 700; color: var(--white); margin-bottom: .18rem; font-family: var(--sans); }
+  .cert-st { font-size: 9.5px; color: var(--text-dim); letter-spacing: .05em; }
+  .cert-st.ok { color: var(--green); }
+  .cert-st.wip { color: #ffd700; }
+
+  /* ── CONTACT ── */
+  #contact { text-align: center; position: relative; overflow: hidden; }
+  .c-glow { position: absolute; width: 900px; height: 400px; background: radial-gradient(ellipse, rgba(0,229,255,0.035) 0%, transparent 70%); left: 50%; top: 50%; transform: translate(-50%,-50%); pointer-events: none; }
+  #contact .inner { position: relative; z-index: 1; }
+  #contact .sec-label { justify-content: center; }
+  #contact p { color: var(--text-mid); max-width: 500px; margin: 1rem auto 2.5rem; font-size: 13px; line-height: 1.95; }
+  .c-links { display: flex; justify-content: center; gap: .9rem; flex-wrap: wrap; margin-top: 1.5rem; }
+  .c-link { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem 1.2rem; border: 1px solid var(--border); color: var(--text-mid); text-decoration: none; font-size: 11px; letter-spacing: .05em; border-radius: 2px; transition: all .2s; }
+  .c-link:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.04); }
+
+  footer { border-top: 1px solid var(--border); padding: 1.4rem clamp(1.5rem,5vw,5rem); display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: var(--text-dim); }
+
+  /* ── ANIMATIONS ── */
+  .fade-up { opacity: 0; transform: translateY(22px); transition: opacity .65s ease, transform .65s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  .cursor-blink { display: inline-block; width: 2px; height: 1.1em; background: var(--accent); vertical-align: middle; margin-left: 2px; animation: cblink .9s step-end infinite; }
+  @keyframes cblink { 50%{ opacity:0 } }
+
+  @media (max-width: 768px) {
+    #about .grid { grid-template-columns: 1fr; gap: 2rem; }
+    nav .nav-links { display: none; }
+    .terminal-panel { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#hero">jar<span class="dim">obledo</span>@<span style="color:var(--accent)">sec</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">about</a></li>
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#projects">projects</a></li>
+    <li><a href="#education">education</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-orb2"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Security Engineering · Threat Detection · Telecom</div>
+    <h1>
+      Juan Antonio<br>
+      <span class="line2">Robledo</span>
+    </h1>
+    <div class="hero-title-accent">
+      Security Analyst &amp; Telecommunications Engineer<span class="cursor-blink"></span>
+    </div>
+    <p class="hero-pitch">
+      MSc Cybersecurity (Univ. Seville) + MSc Telecommunications Engineering (UNIR) — both simultaneously.
+      My thesis maps <strong>MITRE ATT&amp;CK Enterprise techniques against HIDS detection</strong> in an active virtualised lab.
+      My telecoms background means I track threats from the protocol layer up — not just the tool layer.
+    </p>
+    <div class="badge-row">
+      <span class="badge hi">SIEM · Wazuh · Splunk</span>
+      <span class="badge hi">MITRE ATT&amp;CK</span>
+      <span class="badge hi">HIDS / NIDS</span>
+      <span class="badge hi">Python · Bash</span>
+      <span class="badge">Metasploit · Burp Suite</span>
+      <span class="badge">IPv4 / IPv6 / IPSec</span>
+      <span class="badge">English C1</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="CV_JuanAntonio_Robledo.pdf" download>↓ Download CV</a>
+      <a class="btn btn-ghost" href="#projects">View projects →</a>
+      <a class="btn btn-ghost" href="#contact">Contact</a>
+    </div>
+  </div>
+
+  <div class="terminal-panel">
+    <div class="t-line"><span class="dot dot-g"></span> Available for internship</div>
+    <div class="t-line"><span class="dot dot-b"></span> Start: summer 2026</div>
+    <div class="t-line"><span class="dot dot-y"></span> Thesis in progress — MITRE / HIDS</div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="sec-label">01 / about</div>
+  <h2>About me</h2>
+  <div class="hr"></div>
+  <div class="grid fade-up">
+    <div class="about-text">
+      <p>
+        I'm a telecommunications engineer (telematics) who graduated with a
+        <strong>10/10 thesis</strong> on IPv6 security with Secure Neighbor Discovery.
+        I'm currently pursuing two master's degrees in parallel:
+        <strong>Cybersecurity at the University of Seville</strong> and
+        <strong>Telecommunications Engineering at UNIR</strong>.
+      </p>
+      <p>
+        My MSc thesis analyses how well <strong>MITRE ATT&amp;CK Enterprise</strong>
+        network techniques can be detected via HIDS. This means I'm actively deploying,
+        configuring, and testing Wazuh, OSSEC, Samhain, and VelociRaptor in virtualised
+        labs — writing custom rules, correlating events, and validating against documented
+        ATT&amp;CK tactics. Not following a tutorial. Actually doing it.
+      </p>
+      <p>
+        My telecoms foundation isn't a footnote — it's an edge. Understanding BGP, MPLS,
+        IPSec, and IPv6 at a deep level means I can interpret a network alert from the
+        packet upward. I build context, not just dashboards.
+      </p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-n">10<span>/10</span></div>
+        <div class="stat-lbl">BSc thesis grade — IPv6/SeND</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n">2<span>+</span></div>
+        <div class="stat-lbl">MSc degrees simultaneously</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n">5<span>+</span></div>
+        <div class="stat-lbl">SIEM / HIDS / NIDS platforms</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-n">C<span>1</span></div>
+        <div class="stat-lbl">English — advanced</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY BENDING SPOONS ── -->
+<section id="why">
+  <div class="sec-label">01.5 / fit</div>
+  <h2>Why security engineering at Bending Spoons</h2>
+  <div class="hr"></div>
+  <div class="why-grid fade-up">
+    <div class="why-card">
+      <div class="why-icon">🎯</div>
+      <div class="why-title">Assess &amp; Strengthen</div>
+      <div class="why-desc">
+        I've spent months systematically testing which MITRE ATT&amp;CK techniques evade HIDS detection.
+        Finding gaps in security coverage — then closing them — is literally my thesis.
+      </div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">⚙️</div>
+      <div class="why-title">Automate Security</div>
+      <div class="why-desc">
+        I script in Python and Bash. My SIEM work involves custom rule authoring and automated
+        event correlation — not just consuming vendor defaults.
+        I want to embed security controls into pipelines, not bolt them on afterward.
+      </div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🔴</div>
+      <div class="why-title">Attack to Defend</div>
+      <div class="why-desc">
+        Hands-on with Metasploit, Burp Suite, Nmap, and Wireshark. I've run CTF exercises
+        and produced full forensic reports. I understand how attacks work because I've
+        run them in controlled environments.
+      </div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🌐</div>
+      <div class="why-title">Protocol-depth networking</div>
+      <div class="why-desc">
+        IPv4/IPv6, IPSec, BGP, MPLS, VLANs, 802.1X. My telecom background means I can
+        trace a threat through the stack — not just flag it at the application layer.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SKILLS ── -->
+<section id="skills">
+  <div class="sec-label">02 / skills</div>
+  <h2>Technical skills</h2>
+  <div class="hr"></div>
+  <div class="skills-grid fade-up">
+    <div class="skill-cat">
+      <div class="skill-cat-title">📡 Monitoring &amp; Detection</div>
+      <div class="tags">
+        <span class="tag hi">Wazuh</span>
+        <span class="tag hi">Splunk</span>
+        <span class="tag hi">Sagan</span>
+        <span class="tag hi">MITRE ATT&amp;CK</span>
+        <span class="tag">OSSEC</span>
+        <span class="tag">Samhain</span>
+        <span class="tag">VelociRaptor</span>
+        <span class="tag">Snort</span>
+        <span class="tag">Log analysis</span>
+        <span class="tag">Event correlation</span>
+        <span class="tag">Custom rule authoring</span>
+      </div>
+    </div>
+    <div class="skill-cat">
+      <div class="skill-cat-title">🔴 Offensive Security</div>
+      <div class="tags">
+        <span class="tag hi">Metasploit</span>
+        <span class="tag hi">Burp Suite</span>
+        <span class="tag hi">Nmap</span>
+        <span class="tag hi">Wireshark</span>
+        <span class="tag">Pentesting</span>
+        <span class="tag">Forensic analysis</span>
+        <span class="tag">CTF</span>
+        <span class="tag">Linux hardening</span>
+        <span class="tag">Vuln assessment</span>
+      </div>
+    </div>
+    <div class="skill-cat">
+      <div class="skill-cat-title">🌐 Networking &amp; Protocols</div>
+      <div class="tags">
+        <span class="tag hi">IPv4 / IPv6</span>
+        <span class="tag hi">IPSec / VPN</span>
+        <span class="tag">BGP / OSPF</span>
+        <span class="tag">MPLS L2/L3VPN</span>
+        <span class="tag">TCP/UDP</span>
+        <span class="tag">VLAN / 802.1X</span>
+        <span class="tag">SNMP</span>
+        <span class="tag">GNS3 / EVE-NG</span>
+      </div>
+    </div>
+    <div class="skill-cat">
+      <div class="skill-cat-title">⚙️ Systems &amp; Automation</div>
+      <div class="tags">
+        <span class="tag hi">Linux</span>
+        <span class="tag hi">Python</span>
+        <span class="tag hi">Bash</span>
+        <span class="tag">C</span>
+        <span class="tag">JavaScript</span>
+        <span class="tag">Java</span>
+        <span class="tag">Apache / Tomcat</span>
+        <span class="tag">Firewalls</span>
+        <span class="tag">Virtualisation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROJECTS ── -->
+<section id="projects">
+  <div class="sec-label">03 / projects</div>
+  <h2>Selected projects</h2>
+  <div class="hr"></div>
+  <div class="proj-grid fade-up">
+
+    <div class="proj-card">
+      <div class="proj-head">
+        <span class="proj-num">001</span>
+        <span class="ptag ptag-wip">IN PROGRESS</span>
+      </div>
+      <div class="proj-title">MSc Thesis — MITRE ATT&amp;CK vs. HIDS Detection</div>
+      <p class="proj-desc">
+        Systematic analysis of which MITRE ATT&amp;CK Enterprise network techniques are detectable
+        by HIDS platforms. Active virtualised lab: agent deployment, custom detection rules,
+        automated event correlation, and technique-by-technique validation against documented ATT&amp;CK tactics.
+      </p>
+      <div class="stack">
+        <span class="st">Wazuh</span><span class="st">OSSEC</span><span class="st">Samhain</span>
+        <span class="st">VelociRaptor</span><span class="st">MITRE ATT&CK</span><span class="st">EVE-NG</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="#" class="btn btn-ghost disabled" style="font-size:10.5px;">Technical report (coming soon)</a>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-head">
+        <span class="proj-num">002</span>
+        <span class="ptag ptag-siem">SIEM</span>
+      </div>
+      <div class="proj-title">Breach Detection with Wazuh SIEM</div>
+      <p class="proj-desc">
+        End-to-end HIDS monitoring environment: agent deployment across virtualised hosts,
+        custom rule authoring, real-time event correlation, and alert management.
+        Integrated with Splunk for analysis and visualisation.
+      </p>
+      <div class="stack">
+        <span class="st">Wazuh</span><span class="st">Splunk</span>
+        <span class="st">Linux</span><span class="st">Log analysis</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="#" class="btn btn-ghost disabled" style="font-size:10.5px;">Technical report (coming soon)</a>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-head">
+        <span class="proj-num">003</span>
+        <span class="ptag ptag-pentest">PENTEST</span>
+      </div>
+      <div class="proj-title">CTF — Security Forensics Assessment</div>
+      <p class="proj-desc">
+        Capture the Flag exercise (MSc Cybersecurity, Univ. Seville). Identified and exploited
+        vulnerabilities in a controlled environment. Produced a full technical forensic report:
+        attack vectors, findings, and remediation recommendations.
+      </p>
+      <div class="stack">
+        <span class="st">Metasploit</span><span class="st">Burp Suite</span>
+        <span class="st">Nmap</span><span class="st">Forensic report</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="/docs/CTF.pdf" download class="btn btn-ghost" style="font-size:10.5px;">↓ Technical report</a>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-head">
+        <span class="proj-num">004</span>
+        <span class="ptag ptag-net">NAC</span>
+      </div>
+      <div class="proj-title">Enterprise BYOD Network Access Control</div>
+      <p class="proj-desc">
+        Designed and deployed a full NAC system with 802.1X/MAB authentication, captive portal,
+        VLAN segmentation, and role management. Integrated PacketFence with Cisco switches
+        and Active Directory in a simulated enterprise environment.
+      </p>
+      <div class="stack">
+        <span class="st">PacketFence</span><span class="st">802.1X / MAB</span>
+        <span class="st">Cisco Switches</span><span class="st">Active Directory</span><span class="st">VLAN</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="/docs/PacketFence.pdf" download class="btn btn-ghost" style="font-size:10.5px;">↓ Technical report</a>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-head">
+        <span class="proj-num">005</span>
+        <span class="ptag ptag-net">VPN</span>
+      </div>
+      <div class="proj-title">SSL/TLS VPN — Cryptographic Security</div>
+      <p class="proj-desc">
+        Configured host-to-host and client-server VPNs with OpenVPN. Cryptographic security
+        testing, DoS resistance analysis, and encrypted channel integrity verification via
+        Wireshark packet analysis.
+      </p>
+      <div class="stack">
+        <span class="st">OpenVPN</span><span class="st">SSL/TLS</span>
+        <span class="st">IPSec</span><span class="st">Wireshark</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="docs/VPN.pdf" download class="btn btn-ghost" style="font-size:10.5px;">↓ Technical report</a>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-head">
+        <span class="proj-num">006</span>
+        <span class="ptag ptag-research">RESEARCH</span>
+      </div>
+      <div class="proj-title">BSc Thesis — IPv6 with Secure Neighbor Discovery</div>
+      <p class="proj-desc">
+        Built a complete IPv6 testbed with Secure Neighbor Discovery (SeND). Implemented the
+        protocol, validated link-layer attack mitigation (NDP spoofing, RA flooding), and
+        analysed protocol behaviour under adversarial conditions.
+        Grade: <strong style="color:var(--accent)">10 / 10</strong>.
+      </p>
+      <div class="stack">
+        <span class="st">IPv6</span><span class="st">SeND</span>
+        <span class="st">GNS3</span><span class="st">Linux</span><span class="st">Wireshark</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="docs/ipv6_send.pdf" download class="btn btn-ghost" style="font-size:10.5px;">↓ Technical report</a>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-head">
+        <span class="proj-num">007</span>
+        <span class="ptag ptag-siem">NETWORK SECURITY</span>
+      </div>
+      <div class="proj-title">LAN Security — Attack Detection Lab</div>
+      <p class="proj-desc">
+        Virtualised lab for layer-2/3 attack simulation and real-time detection.
+        Covered MAC Flooding, MAC Spoofing, ARP Spoofing, DHCP Starvation, and WiFi attacks —
+        with analysis of detection gaps and mitigation strategies at the switch and protocol level.
+      </p>
+      <div class="stack">
+        <span class="st">Wireshark</span><span class="st">Cisco Switch</span>
+        <span class="st">DHCP</span><span class="st">SNMP</span><span class="st">WiFi</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="docs/seguridad_LAN.pdf" download class="btn btn-ghost" style="font-size:10.5px;">↓ Technical report</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── EDUCATION ── -->
+<section id="education">
+  <div class="sec-label">04 / education</div>
+  <h2>Education &amp; Certifications</h2>
+  <div class="hr"></div>
+
+  <div class="edu-line fade-up">
+    <div class="edu-item">
+      <div class="edu-date">Nov 2025 — Feb 2027</div>
+      <div class="edu-degree">MSc Telecommunications Engineering (Professional licence)</div>
+      <div class="edu-school">Universidad Internacional de La Rioja (UNIR), Spain</div>
+    </div>
+    <div class="edu-item">
+      <div class="edu-date">Oct 2025 — Aug 2026</div>
+      <div class="edu-degree">MSc Cybersecurity</div>
+      <div class="edu-school">University of Seville, Spain</div>
+      <div class="edu-detail">
+        Thesis: <em>Detection capability of MITRE ATT&amp;CK Enterprise network techniques via HIDS</em> —
+        active deployment of Wazuh, OSSEC, Samhain, and VelociRaptor; custom rule authoring,
+        automated event correlation, technique-by-technique validation.
+      </div>
+    </div>
+    <div class="edu-item">
+      <div class="edu-date">Sep 2020 — Jul 2025</div>
+      <div class="edu-degree">BSc Telecommunications Engineering (Telematics)</div>
+      <div class="edu-school">University of Seville, Spain</div>
+      <div class="edu-detail">
+        Thesis: <em>IPv6 testbed with Secure Neighbor Discovery (SeND)</em>.
+        Grade: <strong>10 / 10</strong>.
+      </div>
+    </div>
+  </div>
+
+  <div class="certs fade-up">
+    <div class="cert">
+      <div class="cert-ico">🌐</div>
+      <div>
+        <div class="cert-name">English — Advanced C1</div>
+        <div class="cert-st ok">✓ Verified</div>
+      </div>
+    </div>
+    <div class="cert">
+      <div class="cert-ico">⚔️</div>
+      <div>
+        <div class="cert-name">OSCP+ — Offensive Security Certified Professional+</div>
+        <div class="cert-st wip">⏳ In preparation — late 2026</div>
+      </div>
+    </div>
+    <div class="cert">
+      <div class="cert-ico">🛡️</div>
+      <div>
+        <div class="cert-name">Occupational Health &amp; Safety</div>
+        <div class="cert-st ok">✓ Certified — Basic Level</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact">
+  <div class="c-glow"></div>
+  <div class="inner fade-up">
+    <div class="sec-label">05 / contact</div>
+    <h2>Let's talk</h2>
+    <p>
+      Looking for a security engineering internship where I can contribute to real
+      security challenges — assessing systems, automating controls, and going deeper
+      on threat detection. Open to collaboration and ideas on detection engineering.
+    </p>
+    <a class="btn btn-primary" href="mailto:juanrobledomenendez@gmail.com" style="margin:0 auto;display:inline-flex;">
+      ✉ juanrobledomenendez@gmail.com
+    </a>
+    <div class="c-links">
+      <a class="c-link" href="https://linkedin.com/in/juanantoniorobledo" target="_blank">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a class="c-link" href="https://github.com/jarobledo-sec" target="_blank">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+      <a class="c-link" href="tel:+34615789858">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>
+        +34 615 789 858
+      </a>
+      <a class="c-link" href="CV_JuanAntonio_Robledo.pdf" download>↓ CV PDF</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Juan Antonio Robledo Menéndez · 2026</span>
+  <span style="color:var(--accent);font-size:9.5px;letter-spacing:.12em">SECURITY · TELECOM · DETECTION</span>
+</footer>
+
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
