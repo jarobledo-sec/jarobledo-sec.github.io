@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Juan Antonio Robledo — Ciberseguridad & Telecomunicaciones</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Josefin+Sans:wght@400;600;700&family=Syne:wght@400;600;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:        #080c10;
@@ -38,6 +38,28 @@
     overflow-x: hidden;
   }
 
+  /* ── FONDO DE GRAFO GLOBAL ── */
+  .bg-graph {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(0.6px);   /* desenfoque muy ligero para mantener nitidez */
+    opacity: 0.95;
+  }
+  .bg-graph canvas { width: 100%; height: 100%; display: block; }
+  .bg-graph::after {
+    /* fundido sutil con el fondo en bordes para que no compita con texto */
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(120% 90% at 50% 40%, transparent 0%, transparent 55%, rgba(8,12,16,0.55) 100%);
+    pointer-events: none;
+  }
+
+  /* Aseguramos que el contenido siempre quede encima del canvas */
+  nav, section, footer { position: relative; z-index: 2; }
+
   /* ── SCAN LINES ── */
   body::before {
     content: '';
@@ -63,7 +85,7 @@
   }
 
   nav {
-    position: fixed; top: 0; left: 0; right: 0;
+    position: fixed; top: 28px; left: 0; right: 0;
     z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 clamp(1.5rem, 5vw, 4rem);
@@ -71,6 +93,170 @@
     background: rgba(8,12,16,0.85);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
+  }
+
+  /* ── CVE bar (tira superior con vulnerabilidades) ── */
+  .cve-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 28px;
+    z-index: 101;
+    background: rgba(0,0,0,0.92);
+    border-bottom: 1px solid rgba(255,107,53,0.25);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+  }
+  .cve-bar .cve-label {
+    flex-shrink: 0;
+    padding: 0 .9rem;
+    height: 100%;
+    display: flex; align-items: center; gap: .5rem;
+    background: rgba(255,107,53,0.12);
+    color: var(--accent3);
+    border-right: 1px solid rgba(255,107,53,0.25);
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .cve-bar .cve-label::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 8px var(--accent3);
+    animation: pulse 2s infinite;
+  }
+  .cve-bar .cve-viewport {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+  }
+  .cve-bar .cve-track {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 2.4rem;
+    white-space: nowrap;
+    padding-left: 1.2rem;
+    will-change: transform;
+  }
+  .cve-bar .cve-item {
+    display: inline-flex; align-items: center; gap: .55rem;
+    color: var(--text-mid);
+  }
+  .cve-bar .cve-id {
+    color: var(--accent3);
+    font-weight: 600;
+  }
+  .cve-bar .cve-sev {
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .cve-bar .cve-sev.crit { background: rgba(255,77,109,0.18); color: var(--red); border: 1px solid rgba(255,77,109,0.3); }
+  .cve-bar .cve-sev.high { background: rgba(255,107,53,0.15); color: var(--accent3); border: 1px solid rgba(255,107,53,0.3); }
+  .cve-bar .cve-sev.med  { background: rgba(255,215,0,0.12); color: #ffd700; border: 1px solid rgba(255,215,0,0.3); }
+
+  /* ── Lang toggle ── */
+  .lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+  }
+  .lang-toggle button {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: .3rem .55rem;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    font-family: inherit;
+    font-size: inherit;
+    letter-spacing: inherit;
+    text-transform: uppercase;
+  }
+  .lang-toggle button.active {
+    background: rgba(0,212,255,0.12);
+    color: var(--accent);
+  }
+  .lang-toggle button:hover { color: var(--accent); }
+  .lang-toggle button + button { border-left: 1px solid var(--border); }
+
+  /* ── Airport split-flap clock ── */
+  .flip-clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: var(--mono);
+  }
+  .flap {
+    position: relative;
+    width: 18px; height: 26px;
+    background: #050608;
+    border: 1px solid #1a1f28;
+    border-radius: 2px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    color: #ffc94d;             /* amber aeroportuario */
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.7);
+  }
+  .flap.sep {
+    width: 8px; color: #ffc94d; background: transparent; border: none; box-shadow: none;
+  }
+  .flap::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 1px;
+    background: rgba(0,0,0,0.6);
+    pointer-events: none;
+  }
+  .flap .digit-current,
+  .flap .digit-next {
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .flap .digit-next {
+    transform: translateY(-100%);
+  }
+  .flap.flipping .digit-current {
+    animation: flapOut .42s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  .flap.flipping .digit-next {
+    animation: flapIn .42s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  @keyframes flapOut {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(100%); opacity: .2; }
+  }
+  @keyframes flapIn {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(0); }
+  }
+  .flip-clock .label {
+    margin-left: .55rem;
+    font-size: 10px;
+    letter-spacing: .15em;
+    color: var(--text-dim);
   }
 
   .nav-logo {
@@ -101,19 +287,9 @@
   #hero {
     min-height: 100vh;
     display: flex; align-items: center;
-    padding: 80px clamp(1.5rem, 5vw, 4rem) 0;
+    padding: 108px clamp(1.5rem, 5vw, 4rem) 0;
     position: relative;
     overflow: hidden;
-  }
-
-  .hero-grid-bg {
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(var(--border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: .35;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 80%);
   }
 
   .hero-glow {
@@ -123,9 +299,10 @@
     background: radial-gradient(circle, rgba(0,212,255,0.07) 0%, transparent 70%);
     top: 10%; left: -10%;
     pointer-events: none;
+    z-index: 1;
   }
 
-  .hero-content { position: relative; z-index: 1; max-width: 900px; }
+  .hero-content { position: relative; z-index: 2; max-width: 900px; }
 
   .hero-label {
     font-size: 11px;
@@ -183,6 +360,7 @@
     border-radius: 2px;
     letter-spacing: 0.05em;
     transition: all .2s;
+    background: rgba(8,12,16,0.5);
   }
   .badge:hover { border-color: var(--accent); color: var(--accent); }
   .badge.active { border-color: var(--accent2); color: var(--accent); background: rgba(0,212,255,0.05); }
@@ -214,7 +392,7 @@
   .btn-ghost {
     border: 1px solid var(--border);
     color: var(--text-mid);
-    background: transparent;
+    background: rgba(8,12,16,0.4);
   }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
@@ -224,6 +402,7 @@
     font-size: 11px;
     color: var(--text-dim);
     text-align: right;
+    z-index: 2;
   }
   .status-line { display: flex; align-items: center; gap: .5rem; justify-content: flex-end; }
   .dot { width: 6px; height: 6px; border-radius: 50%; }
@@ -233,7 +412,15 @@
 
   @keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:.4 } }
 
-  section { padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,4rem); }
+  section { padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,4rem); scroll-margin-top: 110px; }
+
+  /* Fondo sutil para que las secciones no compitan con el grafo en zonas densas */
+  #about, #projects, #contact {
+    background: linear-gradient(180deg, rgba(8,12,16,0.55), rgba(8,12,16,0.7));
+  }
+  #skills, #education {
+    background: linear-gradient(180deg, rgba(13,18,25,0.75), rgba(13,18,25,0.85));
+  }
 
   .section-label {
     font-size: 11px;
@@ -266,7 +453,6 @@
     font-size: 1rem;
   }
 
-  /* ── DIVIDER ── */
   .divider {
     height: 1px;
     background: linear-gradient(90deg, var(--border), transparent);
@@ -294,15 +480,18 @@
   .about-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
+    gap: 0;
+    background: transparent;
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
   }
 
   .stat-box {
-    background: var(--bg2);
+    background: rgba(13,18,25,0.92);
     padding: 1.5rem;
     transition: background .2s;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
   }
   .stat-box:hover { background: var(--bg3); }
 
@@ -323,28 +512,29 @@
     text-transform: uppercase;
   }
 
-  #skills { background: var(--bg2); }
-
   .skills-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
+    gap: 0;
+    background: transparent;
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
     margin-top: 3rem;
   }
-  
+
   .btn.disabled {
-  opacity: 0.5;
-  pointer-events: none;
+    opacity: 0.5;
+    pointer-events: none;
   }
 
   .skill-category {
-    background: var(--bg);
+    background: rgba(8,12,16,0.92);
     padding: 2rem;
     position: relative;
     overflow: hidden;
     transition: background .2s;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
   }
   .skill-category:hover { background: var(--bg3); }
 
@@ -391,19 +581,24 @@
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
+    gap: 0;
+    background: transparent;
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
     margin-top: 3rem;
   }
 
   .project-card {
-    background: var(--bg2);
+    background: rgba(13,18,25,0.92);
     padding: 2rem;
     position: relative;
     overflow: hidden;
     cursor: default;
     transition: background .2s;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
   }
   .project-card:hover { background: var(--bg3); }
 
@@ -454,13 +649,21 @@
 
   .project-desc {
     font-size: 12.5px;
-    color: var(--text-mid);
+    color: #8aabb8;
     line-height: 1.8;
     margin-bottom: 1.2rem;
   }
+  .project-desc strong,
+  .project-desc span,
+  .project-desc em,
+  .project-desc b { color: #8aabb8 !important; }
 
   .project-stack {
     display: flex; flex-wrap: wrap; gap: .3rem;
+    margin-top: auto;
+  }
+  .project-report {
+    margin-top: 1.2rem;
   }
 
   .stack-item {
@@ -471,8 +674,6 @@
     border-radius: 2px;
     border: 1px solid rgba(255,255,255,0.06);
   }
-
-  #education { background: var(--bg2); }
 
   .edu-timeline {
     margin-top: 3rem;
@@ -537,17 +738,20 @@
   .certs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
+    gap: 0;
+    background: transparent;
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
     margin-top: 3rem;
   }
 
   .cert-card {
-    background: var(--bg);
+    background: rgba(8,12,16,0.92);
     padding: 1.5rem 2rem;
     display: flex; align-items: center; gap: 1.2rem;
     transition: background .2s;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
   }
   .cert-card:hover { background: var(--bg3); }
 
@@ -615,6 +819,7 @@
     letter-spacing: .05em;
     border-radius: 2px;
     transition: all .2s;
+    background: rgba(8,12,16,0.5);
   }
   .contact-link:hover {
     border-color: var(--accent);
@@ -628,6 +833,7 @@
     display: flex; justify-content: space-between; align-items: center;
     font-size: 11px;
     color: var(--text-dim);
+    background: rgba(8,12,16,0.9);
   }
 
   .typewriter {
@@ -643,106 +849,525 @@
 
   .fade-up {
     opacity: 0;
-    transform: translateY(24px);
-    transition: opacity .6s ease, transform .6s ease;
+    transform: translateY(12px);
+    filter: blur(4px);
+    transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .9s cubic-bezier(.16,1,.3,1);
   }
-  .fade-up.visible { opacity: 1; transform: translateY(0); }
+  .fade-up.visible { opacity: 1; transform: translateY(0); filter: blur(0); }
+
+  /* ── Barra de progreso de scroll ── */
+  .scroll-progress {
+    position: fixed; top: 0; left: 0;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #7af0ff);
+    box-shadow: 0 0 12px rgba(0,212,255,0.55);
+    z-index: 200;
+    transition: width .08s linear;
+  }
+
+  /* ── Active nav link ── */
+  .nav-links a {
+    position: relative;
+    padding: 4px 0;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -2px;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .25s ease;
+  }
+  .nav-links a.active { color: var(--accent); }
+  .nav-links a.active::after { transform: scaleX(1); }
+
+  /* ── Side rail de secciones ── */
+  .side-rail {
+    position: fixed;
+    right: 1.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: .9rem;
+    z-index: 90;
+  }
+  .rail-dot {
+    position: relative;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--text-dim);
+    background: transparent;
+    cursor: pointer;
+    transition: all .25s ease;
+  }
+  .rail-dot:hover { border-color: var(--accent); }
+  .rail-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(0,212,255,0.7);
+  }
+  .rail-dot .label {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    background: rgba(8,12,16,0.92);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+  .rail-dot:hover .label { opacity: 1; color: var(--accent); border-color: rgba(0,212,255,0.3); }
+
+  /* ── Back to top ── */
+  .back-to-top {
+    position: fixed;
+    bottom: 1.6rem; right: 1.6rem;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: rgba(8,12,16,0.92);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 90;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity .25s, transform .25s, border-color .2s;
+    backdrop-filter: blur(6px);
+  }
+  .back-to-top.visible { opacity: 1; transform: translateY(0); }
+  .back-to-top:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 18px rgba(0,212,255,0.25);
+  }
+  .back-to-top svg { width: 14px; height: 14px; }
+
+  /* ── Corner brackets decorativos en hero ── */
+  .hero-bracket {
+    position: absolute;
+    width: 28px; height: 28px;
+    border-color: var(--accent);
+    opacity: .35;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .hero-bracket.tl { top: 78px; left: clamp(1rem, 4vw, 3rem); border-top: 1px solid; border-left: 1px solid; }
+  .hero-bracket.tr { top: 78px; right: clamp(1rem, 4vw, 3rem); border-top: 1px solid; border-right: 1px solid; }
+  .hero-bracket.bl { bottom: 1rem;  left: clamp(1rem, 4vw, 3rem); border-bottom: 1px solid; border-left: 1px solid; }
+  .hero-bracket.br { bottom: 1rem;  right: clamp(1rem, 4vw, 3rem); border-bottom: 1px solid; border-right: 1px solid; }
+
+  /* ── Counter de stats animado ── */
+  .stat-num { font-variant-numeric: tabular-nums; }
+
+  /* ── Highlight de índice de sección al hover ── */
+  .section-label {
+    transition: letter-spacing .3s ease;
+  }
+  section:hover > .section-label { letter-spacing: .25em; }
+
+  /* ── Cursor glow follower ── */
+  .cursor-glow {
+    position: fixed;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, rgba(0,212,255,0.025) 35%, transparent 65%);
+    pointer-events: none;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen;
+    opacity: 0;
+    transition: opacity .3s;
+    will-change: transform;
+  }
+  .cursor-glow.visible { opacity: 1; }
+  @media (hover: none) { .cursor-glow { display: none; } }
+
+  /* ── 3D tilt en project cards ── */
+  .projects-grid { perspective: 1200px; }
+  .project-card {
+    transform-style: preserve-3d;
+    transition: background .2s, transform .15s ease-out;
+  }
+  .project-card .project-title,
+  .project-card .project-tag {
+    transform: translateZ(20px);
+  }
+
+  /* ── Magnetic buttons ── */
+  .btn-primary, .contact-link {
+    will-change: transform;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), background .2s, border-color .2s, color .2s, box-shadow .2s;
+  }
+
+  /* ── Comando / terminal flotante (easter egg) ── */
+  .konami-toast {
+    position: fixed;
+    bottom: 1.6rem; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(8,12,16,0.95);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    padding: .6rem 1.1rem;
+    border-radius: 2px;
+    z-index: 300;
+    box-shadow: 0 0 24px rgba(0,212,255,0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s, transform .3s;
+  }
+  .konami-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Modo MATRIX (easter egg) ── */
+  body.matrix-mode .bg-graph { filter: blur(0.6px) hue-rotate(120deg) saturate(1.4); }
+  body.matrix-mode .scroll-progress { background: linear-gradient(90deg, #00e5a0, #7affd0); box-shadow: 0 0 12px rgba(0,229,160,0.6); }
+
+  /* ── Skill tag pulse al hover ── */
+  .skill-tag.highlight { position: relative; }
+  .skill-tag.highlight::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border: 1px solid rgba(0,212,255,0.4);
+    border-radius: 2px;
+    opacity: 0;
+    transform: scale(1);
+    transition: transform .4s, opacity .4s;
+  }
+  .skill-tag.highlight:hover::before { opacity: 1; transform: scale(1.4); }
+
+  /* ── Stat box hover lift ── */
+  .stat-box { transition: background .2s, transform .25s ease; }
+  .stat-box:hover { transform: translateY(-3px); }
+
+  /* ── Marquee / security ticker ── */
+  .marquee {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(8,12,16,0.85), rgba(13,18,25,0.92));
+    padding: 1.4rem 0;
+    z-index: 2;
+  }
+  .marquee::before, .marquee::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 140px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .marquee::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--bg) 0%, rgba(8,12,16,0) 100%);
+  }
+  .marquee::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--bg) 0%, rgba(8,12,16,0) 100%);
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 3rem;
+    /* animation se controla vía JS para variar velocidad/dirección */
+    will-change: transform;
+  }
+  .marquee-item {
+    display: inline-flex;
+    align-items: center;
+    gap: .9rem;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    white-space: nowrap;
+  }
+  .marquee-item .dot-sep {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(0,212,255,0.6);
+  }
+  .marquee-item .tag-mq {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .marquee-item .tag-mq.alert { color: var(--accent3); }
+  .marquee-item .tag-mq.ok    { color: var(--green); }
+
+  /* ── Glitch en h2 al hover ── */
+  h2 { position: relative; }
+  h2.glitching::before, h2.glitching::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    pointer-events: none;
+  }
+  h2.glitching::before {
+    color: var(--accent);
+    transform: translate(-2px, 0);
+    clip-path: polygon(0 8%, 100% 8%, 100% 36%, 0 36%);
+    mix-blend-mode: screen;
+  }
+  h2.glitching::after {
+    color: var(--accent3);
+    transform: translate(2px, 0);
+    clip-path: polygon(0 58%, 100% 58%, 100% 88%, 0 88%);
+    mix-blend-mode: screen;
+  }
+
+  /* ── Live clock en nav ── */
+  .nav-clock {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    margin-left: 1.5rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--border);
+  }
+
+  /* ── Scroll hint indicator (hero) ── */
+  .scroll-hint {
+    position: absolute;
+    bottom: 1.4rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: .4rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .2em;
+    z-index: 3;
+    pointer-events: none;
+    transition: opacity .3s;
+  }
+  .scroll-hint .arrow {
+    width: 18px; height: 18px;
+    border-right: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    transform: rotate(45deg);
+    animation: hintBounce 1.8s ease-in-out infinite;
+  }
+  @keyframes hintBounce {
+    0%,100% { transform: rotate(45deg) translate(0,0); opacity: .3; }
+    50%     { transform: rotate(45deg) translate(4px,4px); opacity: 1; }
+  }
+  @media (max-width: 768px) {
+    .nav-clock { display: none; }
+    .cve-bar { font-size: 10px; }
+    .cve-bar .cve-label { padding: 0 .6rem; font-size: 9px; }
+    .lang-toggle { margin-left: .5rem; }
+  }
+
+  /* ── Toast inferior (copy feedback, etc) ── */
+  .feedback-toast {
+    position: fixed;
+    bottom: 1.6rem; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(8,12,16,0.95);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .55rem 1rem;
+    border-radius: 2px;
+    z-index: 310;
+    box-shadow: 0 0 22px rgba(0,229,160,0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s;
+  }
+  .feedback-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Confetti canvas ── */
+  #fxCanvas {
+    position: fixed; inset: 0; pointer-events: none; z-index: 305;
+  }
 
   @media (max-width: 768px) {
     #about .about-grid { grid-template-columns: 1fr; gap: 2rem; }
     .about-stats { grid-template-columns: 1fr 1fr; }
     nav .nav-links { display: none; }
     .terminal-status { display: none; }
+    .side-rail { display: none; }
+    .hero-bracket { display: none; }
   }
 </style>
 </head>
 <body>
 
+<!-- CVE bar superior -->
+<div class="cve-bar" aria-label="Vulnerabilidades recientes">
+  <div class="cve-label"><span data-i18n="cve_feed">CVE feed</span></div>
+  <div class="cve-viewport">
+    <div class="cve-track" id="cveTrack"></div>
+  </div>
+</div>
+
+<!-- Toast de feedback (copia, etc) -->
+<div class="feedback-toast" id="fbToast">✓ COPIADO AL PORTAPAPELES</div>
+
+<!-- Canvas para confetti / partículas FX -->
+<canvas id="fxCanvas" aria-hidden="true"></canvas>
+
+<!-- Cursor glow -->
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+<!-- Toast easter egg -->
+<div class="konami-toast" id="konamiToast">// ACCESS GRANTED · MATRIX MODE ENABLED</div>
+
+<!-- Barra de progreso de scroll -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Side rail de navegación por secciones -->
+<aside class="side-rail" aria-label="Navegación lateral">
+  <a class="rail-dot" href="#hero"      data-rail="hero"><span class="label">Inicio</span></a>
+  <a class="rail-dot" href="#about"     data-rail="about"><span class="label">Sobre mí</span></a>
+  <a class="rail-dot" href="#skills"    data-rail="skills"><span class="label">Skills</span></a>
+  <a class="rail-dot" href="#projects"  data-rail="projects"><span class="label">Proyectos</span></a>
+  <a class="rail-dot" href="#education" data-rail="education"><span class="label">Formación</span></a>
+  <a class="rail-dot" href="#contact"   data-rail="contact"><span class="label">Contacto</span></a>
+</aside>
+
+<!-- Botón volver arriba -->
+<button class="back-to-top" id="backToTop" aria-label="Volver arriba">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<!-- Fondo de grafo animado, cubre toda la página -->
+<div class="bg-graph" aria-hidden="true">
+  <canvas id="graph"></canvas>
+</div>
+
 <nav>
-  <a class="nav-logo" href="#hero">jar<span>obledo</span><span style="color:var(--accent)">@sec</span></a>
+  <a class="nav-logo" href="#hero">jar<span style="color: rgb(1, 211, 254)">obledo</span><span style="color:var(--accent)">@sec</span></a>
+  <div class="nav-clock" id="navClock">
+    <div class="flip-clock" id="flipClock" aria-label="Hora actual"></div>
+    <span class="label">CET</span>
+  </div>
   <ul class="nav-links">
-    <li><a href="#about">about</a></li>
-    <li><a href="#skills">skills</a></li>
-    <li><a href="#projects">proyectos</a></li>
-    <li><a href="#education">formación</a></li>
-    <li><a href="#contact">contacto</a></li>
+    <li><a href="#about"     data-i18n="nav_about">about</a></li>
+    <li><a href="#skills"    data-i18n="nav_skills">skills</a></li>
+    <li><a href="#projects"  data-i18n="nav_projects">proyectos</a></li>
+    <li><a href="#education" data-i18n="nav_education">formación</a></li>
+    <li><a href="#contact"   data-i18n="nav_contact">contacto</a></li>
   </ul>
+  <div class="lang-toggle" role="group" aria-label="Idioma">
+    <button data-lang="es">ES</button>
+    <button data-lang="en">EN</button>
+  </div>
 </nav>
 
 <section id="hero">
-  <div class="hero-grid-bg"></div>
+  <span class="hero-bracket tl"></span>
+  <span class="hero-bracket tr"></span>
+  <span class="hero-bracket bl"></span>
+  <span class="hero-bracket br"></span>
   <div class="hero-glow"></div>
   <div class="hero-content">
-    <div class="hero-label">Ciberseguridad · Telecomunicaciones · Detección de Amenazas</div>
-    <h1>Juan Antonio<br><span class="dim">Robledo</span></h1>
+    <div class="hero-label" data-i18n="hero_label">Ciberseguridad · Telecomunicaciones · Detección de Amenazas</div>
+    <h1 style="font-family: &quot;IBM Plex Mono&quot;">Juan Antonio<br><span class="dim">Robledo</span></h1>
     <div class="hero-sub">
-      <span class="typewriter">Security Analyst & Telecom Engineer</span>
+      <span class="typewriter">Telecom &amp; Security Engineer</span>
     </div>
-    <p class="hero-desc">
-      Estudiante de Máster en Ciberseguridad (US) y Máster en Ingeniería de Telecomunicación (UNIR).
-      Especializado en monitorización SIEM, detección de intrusiones HIDS/NIDS
-      y la metodología MITRE ATT&amp;CK. Busco prácticas en entornos de ciberseguridad activa.
+    <p class="hero-desc" data-i18n="hero_desc">
+      Ingeniero de Telecomunicaciones (23) especializado en monitorización de amenazas, análisis
+      de vulnerabilidades, gestión de incidentes y respuesta a ataques. Cursando simultáneamente
+      el Máster en Ciberseguridad (US) y el Máster en Ingeniería de Telecomunicación (UNIR).
+      Experiencia práctica con SIEM, HIDS/NIDS, pentesting y auditorías de seguridad — disponible
+      para incorporación inmediata.
     </p>
     <div class="hero-badges">
-      <span class="badge active">SIEM · Wazuh · Splunk</span>
+      <span class="badge active">SIEM · Splunk · ELK</span>
       <span class="badge active">MITRE ATT&amp;CK</span>
-      <span class="badge active">HIDS / NIDS</span>
-      <span class="badge">Pentesting</span>
+      <span class="badge active">HIDS / NIDS · Wazuh</span>
+      <span class="badge active">DFIR · VelociRaptor</span>
+      <span class="badge">Pentesting · OWASP</span>
+      <span class="badge">ISO 27001 · NIST · ENS · NIS2</span>
+      <span class="badge">5G Core · Open5GS</span>
       <span class="badge">IPv4 / IPv6</span>
-      <span class="badge">Python · Bash</span>
+      <span class="badge">Python · Bash · LLMs</span>
       <span class="badge">Inglés C1</span>
     </div>
     <div class="hero-cta">
       <a class="btn btn-primary" href="CV_JuanAntonio_Robledo.pdf" download>
-        ↓ Descargar CV
+        ↓ <span data-i18n="cta_cv">Descargar CV</span>
       </a>
-      <a class="btn btn-ghost" href="#projects">Ver proyectos →</a>
-      <a class="btn btn-ghost" href="#contact">Contacto</a>
+      <a class="btn btn-ghost" href="#projects"><span data-i18n="cta_projects">Ver proyectos</span> →</a>
+      <a class="btn btn-ghost" href="#contact" data-i18n="cta_contact">Contacto</a>
     </div>
   </div>
 
   <div class="terminal-status">
-    <div class="status-line"><span class="dot dot-green"></span> Disponible para prácticas</div>
-    <div class="status-line" style="margin-top:.3rem"><span class="dot dot-blue"></span> Incorporación: verano 2026</div>
-    <div class="status-line" style="margin-top:.3rem"><span class="dot dot-yellow"></span> TFM en curso — MITRE ATT&amp;CK / HIDS</div>
+    <div class="status-line"><span class="dot dot-green"></span> <span data-i18n="status_avail">Disponible para incorporación inmediata</span></div>
+    <div class="status-line" style="margin-top:.3rem"></div>
+    <div class="status-line" style="margin-top:.3rem"><span class="dot dot-yellow"></span> <span data-i18n="status_tfm">2 TFM en curso — MITRE ATT&amp;CK · 5G/NWDAF</span></div>
+  </div>
+
+  <div class="scroll-hint">
+    <span data-i18n="scroll">SCROLL</span>
+    <span class="arrow"></span>
   </div>
 </section>
 
+<!-- Marquee / Security ticker -->
+<div class="marquee" id="marquee" aria-hidden="true">
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
 <section id="about">
-  <div class="section-label">01 / about</div>
-  <h2>Sobre mí</h2>
+  <div class="section-label"><span>01 / </span><span data-i18n="sec_about">about</span></div>
+  <h2 data-i18n="h_about">Sobre mí</h2>
   <div class="divider"></div>
   <div class="about-grid fade-up">
     <div class="about-text">
       <p>
         Soy ingeniero de telecomunicaciones (especialidad telemática) graduado con un
-        <strong>TFG calificado con 10/10</strong> sobre seguridad en IPv6 con Secure Neighbor Discovery.
+        <strong>TFG calificado con 10/10</strong> sobre seguridad en IPv6.
         Actualmente curso de forma simultánea el <strong>Máster en Ciberseguridad en la Universidad de Sevilla</strong>
         y el <strong>Máster en Ingeniería de Telecomunicación en la UNIR</strong>.
       </p>
       <p>
-        Mi Trabajo Fin de Máster analiza la capacidad de detección de ataques en red de la
-        <strong>matriz MITRE ATT&amp;CK Enterprise mediante HIDS</strong>, lo que me ha llevado a
+        Uno de mis Trabajos de Fin de Máster analiza la capacidad de detección de ataques en red
+        de la <strong>matriz MITRE ATT&amp;CK Enterprise mediante HIDS</strong>, lo que me ha llevado a
         desplegar y configurar activamente plataformas como Wazuh, OSSEC, Samhain y VelociRaptor
         en entornos virtualizados.
       </p>
       <p>
-        Mi formación en telecomunicaciones no es un detalle menor en ciberseguridad: comprender
-        en profundidad los protocolos sobre los que se asientan las amenazas — BGP, MPLS, IPSec,
-        IPv6 — me permite interpretar una alerta de red desde la capa de red hacia arriba.
+        Mi perfil combina la operación de <strong>SIEM, HIDS/NIDS y DFIR</strong> con
+        <strong>auditorías de seguridad</strong>, evaluación de vulnerabilidades (CVE, OWASP Top 10)
+        y respuesta a incidentes, sobre la base de marcos como
+        <strong>ISO 27001, NIST CSF, ENS y NIS2</strong>. Disponible para incorporación inmediata.
       </p>
     </div>
     <div class="about-stats">
       <div class="stat-box">
-        <div class="stat-num">10<span>/10</span></div>
+        <div class="stat-num" data-count="10">10<span>/10</span></div>
         <div class="stat-label">Nota TFG IPv6/SeND</div>
       </div>
       <div class="stat-box">
-        <div class="stat-num">2<span>+</span></div>
+        <div class="stat-num" data-count="2">2<span>+</span></div>
         <div class="stat-label">Másteres simultáneos</div>
       </div>
       <div class="stat-box">
-        <div class="stat-num">5<span>+</span></div>
+        <div class="stat-num" data-count="5">5<span>+</span></div>
         <div class="stat-label">SIEMs y HIDS/NIDS</div>
       </div>
       <div class="stat-box">
@@ -754,70 +1379,94 @@
 </section>
 
 <section id="skills">
-  <div class="section-label">02 / skills</div>
-  <h2>Habilidades técnicas</h2>
+  <div class="section-label"><span>02 / </span><span data-i18n="sec_skills">skills</span></div>
+  <h2 data-i18n="h_skills">Habilidades técnicas</h2>
   <div class="divider"></div>
   <div class="skills-grid fade-up">
     <div class="skill-category">
-      <div class="skill-cat-title">📡 Monitorización & Detección</div>
+      <div class="skill-cat-title">📊 Monitorización &amp; Detección de Amenazas</div>
       <div class="skill-tags">
-        <span class="skill-tag highlight">Wazuh</span>
         <span class="skill-tag highlight">Splunk</span>
-        <span class="skill-tag highlight">Sagan</span>
+        <span class="skill-tag highlight">ELK Stack</span>
+        <span class="skill-tag highlight">Wazuh</span>
+        <span class="skill-tag highlight">Snort</span>
+        <span class="skill-tag highlight">VelociRaptor</span>
         <span class="skill-tag highlight">MITRE ATT&amp;CK</span>
+        <span class="skill-tag">MITRE FiGHT</span>
         <span class="skill-tag">OSSEC</span>
         <span class="skill-tag">Samhain</span>
-        <span class="skill-tag">VelociRaptor</span>
-        <span class="skill-tag">Snort</span>
+        <span class="skill-tag">Sagan</span>
+        <span class="skill-tag">DFIR</span>
         <span class="skill-tag">Análisis de logs</span>
         <span class="skill-tag">Correlación de eventos</span>
+        <span class="skill-tag">Gestión de incidentes</span>
       </div>
     </div>
     <div class="skill-category">
-      <div class="skill-cat-title">🔴 Seguridad Ofensiva</div>
+      <div class="skill-cat-title">🔴 Pentesting &amp; Evaluación de Vulnerabilidades</div>
       <div class="skill-tags">
         <span class="skill-tag highlight">Metasploit</span>
         <span class="skill-tag highlight">Burp Suite</span>
         <span class="skill-tag highlight">Nmap</span>
         <span class="skill-tag highlight">Wireshark</span>
-        <span class="skill-tag">Pentesting</span>
+        <span class="skill-tag">CVE</span>
+        <span class="skill-tag">OWASP Top 10</span>
+        <span class="skill-tag">Evaluación de riesgos</span>
+        <span class="skill-tag">Informes de auditoría</span>
         <span class="skill-tag">Análisis forense</span>
-        <span class="skill-tag">CTF</span>
         <span class="skill-tag">Bastionado Linux</span>
+        <span class="skill-tag">CTF</span>
       </div>
     </div>
     <div class="skill-category">
-      <div class="skill-cat-title">🌐 Redes & Telecomunicaciones</div>
+      <div class="skill-cat-title">📜 Estándares &amp; Marcos de Seguridad</div>
+      <div class="skill-tags">
+        <span class="skill-tag highlight">ISO 27001</span>
+        <span class="skill-tag highlight">NIST CSF</span>
+        <span class="skill-tag highlight">ENS</span>
+        <span class="skill-tag highlight">NIS2</span>
+        <span class="skill-tag">Gestión de riesgos</span>
+        <span class="skill-tag">Políticas de seguridad</span>
+        <span class="skill-tag">Cumplimiento normativo</span>
+        <span class="skill-tag">Gobernanza SI</span>
+      </div>
+    </div>
+    <div class="skill-category">
+      <div class="skill-cat-title">🌐 Redes &amp; Telecomunicaciones</div>
       <div class="skill-tags">
         <span class="skill-tag highlight">IPv4 / IPv6</span>
         <span class="skill-tag highlight">IPSec / VPN</span>
+        <span class="skill-tag highlight">5G Core · Open5GS</span>
         <span class="skill-tag">BGP / OSPF</span>
         <span class="skill-tag">MPLS L2/L3VPN</span>
         <span class="skill-tag">TCP/UDP</span>
         <span class="skill-tag">VLAN / 802.1X</span>
+        <span class="skill-tag">Firewalls</span>
         <span class="skill-tag">SNMP</span>
         <span class="skill-tag">GNS3 / EVE-NG</span>
       </div>
     </div>
     <div class="skill-category">
-      <div class="skill-cat-title">⚙️ Sistemas & Scripting</div>
+      <div class="skill-cat-title">⚙️ Sistemas, Scripting &amp; LLMs</div>
       <div class="skill-tags">
         <span class="skill-tag highlight">Linux</span>
         <span class="skill-tag highlight">Python</span>
         <span class="skill-tag highlight">Bash</span>
+        <span class="skill-tag highlight">Mistral-7B-Instruct</span>
+        <span class="skill-tag highlight">HuggingFace</span>
         <span class="skill-tag">C</span>
         <span class="skill-tag">JavaScript</span>
         <span class="skill-tag">Java</span>
         <span class="skill-tag">Apache / Tomcat</span>
-        <span class="skill-tag">Firewalls</span>
+        <span class="skill-tag">Automatización de seguridad</span>
       </div>
     </div>
   </div>
 </section>
 
 <section id="projects">
-  <div class="section-label">03 / proyectos</div>
-  <h2>Proyectos destacados</h2>
+  <div class="section-label"><span>03 / </span><span data-i18n="sec_projects">proyectos</span></div>
+  <h2 data-i18n="h_projects">Proyectos destacados</h2>
   <div class="divider"></div>
   <div class="projects-grid fade-up">
 
@@ -826,7 +1475,7 @@
         <span class="project-num">001</span>
         <span class="project-tag tag-wip">EN CURSO</span>
       </div>
-      <div class="project-title">TFM — MITRE ATT&amp;CK & HIDS en Red</div>
+      <div class="project-title">TFM  - MITRE ATT&amp;CK &amp; HIDS en Red</div>
       <p class="project-desc">
         Análisis de la capacidad de detección de ataques en red de la matriz MITRE ATT&amp;CK
         Enterprise mediante sistemas HIDS. Despliegue activo en laboratorio virtualizado:
@@ -841,16 +1490,38 @@
         <span class="stack-item">MITRE ATT&amp;CK</span>
         <span class="stack-item">EVE-NG</span>
       </div>
-            <div style="margin-top:1.2rem;">
-      <a href="#" class="btn btn-ghost disabled" style="font-size:11px;">
-Informe técnico (próximamente)
-	</a>
-	</div>
+      <div style="margin-top:1.2rem;">
+        <a href="#" class="btn btn-ghost disabled" style="font-size:11px;">
+          Informe técnico (próximamente)
+        </a>
+      </div>
     </div>
 
     <div class="project-card">
       <div class="project-header">
         <span class="project-num">002</span>
+        <span class="project-tag tag-wip">EN CURSO</span>
+      </div>
+      <div class="project-title">TFM - NWDAF + LLMs en 5G Core (Open5GS)</div>
+      <p class="project-desc">Extensión semántica del NWDAF mediante LLMs para la detección de ataques NAS estructurales sobre redes 5G Core en Open5GS, aplicando la matriz MITRE FiGHT. Integración de inferencia LLM con pipelines de detección y validación contra técnicas conocidas en redes móviles.</p>
+      <div class="project-stack">
+        <span class="stack-item">Open5GS</span>
+        <span class="stack-item">NWDAF</span>
+        <span class="stack-item">MITRE FiGHT</span>
+        <span class="stack-item">Mistral-7B</span>
+        <span class="stack-item">HuggingFace</span>
+        <span class="stack-item">Python</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="#" class="btn btn-ghost disabled" style="font-size:11px;">
+          Informe técnico (próximamente)
+        </a>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-num">003</span>
         <span class="project-tag tag-siem">SIEM</span>
       </div>
       <div class="project-title">Detección de Breach con SIEM — Wazuh</div>
@@ -866,15 +1537,15 @@ Informe técnico (próximamente)
         <span class="stack-item">Análisis de logs</span>
       </div>
       <div style="margin-top:1.2rem;">
-    <a href="/docs/ciso.pdf" download class="btn btn-ghost" style="font-size:11px;">
-      ↓ Ver informe técnico
-    </a>
-	</div>
+        <a href="/docs/ciso.pdf" download class="btn btn-ghost" style="font-size:11px;">
+          ↓ Ver informe técnico
+        </a>
+      </div>
     </div>
 
     <div class="project-card">
       <div class="project-header">
-        <span class="project-num">003</span>
+        <span class="project-num">004</span>
         <span class="project-tag tag-pentest">PENTEST</span>
       </div>
       <div class="project-title">CTF — Análisis Forense de Seguridad</div>
@@ -889,16 +1560,16 @@ Informe técnico (próximamente)
         <span class="stack-item">Nmap</span>
         <span class="stack-item">Informe forense</span>
       </div>
-        <div style="margin-top:1.2rem;">
-    <a href="/docs/CTF.pdf" download class="btn btn-ghost" style="font-size:11px;">
-      ↓ Ver informe técnico
-    </a>
-  </div>
+      <div style="margin-top:1.2rem;">
+        <a href="/docs/CTF.pdf" download class="btn btn-ghost" style="font-size:11px;">
+          ↓ Ver informe técnico
+        </a>
+      </div>
     </div>
 
     <div class="project-card">
       <div class="project-header">
-        <span class="project-num">004</span>
+        <span class="project-num">005</span>
         <span class="project-tag tag-network">NAC</span>
       </div>
       <div class="project-title">Hotspot BYOD con NAC Empresarial</div>
@@ -914,16 +1585,16 @@ Informe técnico (próximamente)
         <span class="stack-item">Active Directory</span>
         <span class="stack-item">VLAN</span>
       </div>
-        <div style="margin-top:1.2rem;">
-    <a href="/docs/PacketFence.pdf" download class="btn btn-ghost" style="font-size:11px;">
-      ↓ Ver informe técnico
-    </a>
-  </div>
+      <div style="margin-top:1.2rem;">
+        <a href="/docs/PacketFence.pdf" download class="btn btn-ghost" style="font-size:11px;">
+          ↓ Ver informe técnico
+        </a>
+      </div>
     </div>
 
     <div class="project-card">
       <div class="project-header">
-        <span class="project-num">005</span>
+        <span class="project-num">006</span>
         <span class="project-tag tag-network">VPN</span>
       </div>
       <div class="project-title">VPN SSL/TLS — Seguridad Criptográfica</div>
@@ -938,16 +1609,16 @@ Informe técnico (próximamente)
         <span class="stack-item">IPSec</span>
         <span class="stack-item">Wireshark</span>
       </div>
-        <div style="margin-top:1.2rem;">
-    <a href="docs/VPN.pdf" download class="btn btn-ghost" style="font-size:11px;">
-      ↓ Ver informe técnico
-    </a>
-  </div>
+      <div style="margin-top:1.2rem;">
+        <a href="docs/VPN.pdf" download class="btn btn-ghost" style="font-size:11px;">
+          ↓ Ver informe técnico
+        </a>
+      </div>
     </div>
 
     <div class="project-card">
       <div class="project-header">
-        <span class="project-num">006</span>
+        <span class="project-num">007</span>
         <span class="project-tag tag-research">INVESTIGACIÓN</span>
       </div>
       <div class="project-title">TFG — IPv6 con Secure Neighbor Discovery (SeND)</div>
@@ -963,49 +1634,47 @@ Informe técnico (próximamente)
         <span class="stack-item">Linux</span>
         <span class="stack-item">Wireshark</span>
       </div>
-        <div style="margin-top:1.2rem;">
-    <a href="docs/ipv6_send.pdf" download class="btn btn-ghost" style="font-size:11px;">
-      ↓ Ver informe técnico
-    </a>
-  </div>
+      <div style="margin-top:1.2rem;">
+        <a href="docs/ipv6_send.pdf" download class="btn btn-ghost" style="font-size:11px;">
+          ↓ Ver informe técnico
+        </a>
+      </div>
     </div>
-<div class="project-card">
-  <div class="project-header">
-    <span class="project-num">007</span>
-    <span class="project-tag tag-siem">NETWORK SECURITY</span>
-  </div>
 
-  <div class="project-title">
-    Seguridad en Redes LAN — Detección y Análisis de Ataques
-  </div>
+    <div class="project-card">
+      <div class="project-header">
+        <span class="project-num">008</span>
+        <span class="project-tag tag-siem">NETWORK SECURITY</span>
+      </div>
+      <div class="project-title">
+        Seguridad en Redes LAN — Detección y Análisis de Ataques
+      </div>
+      <p class="project-desc">
+        Desarrollo de un laboratorio de ciberseguridad enfocado en el análisis de vulnerabilidades
+        en redes LAN y la detección de ataques en tiempo real. Simulación de técnicas ofensivas
+        a nivel de capa 2 y 3, incluyendo MAC Flooding, MAC Spoofing, ARP Spoofing,
+        DHCP Starvation y ataques WiFi.
+      </p>
+      <div class="project-stack">
+        <span class="stack-item">SNMP</span>
+        <span class="stack-item">Wireshark</span>
+        <span class="stack-item">DHCP</span>
+        <span class="stack-item">Cisco Switch</span>
+        <span class="stack-item">Wifi</span>
+      </div>
+      <div style="margin-top:1.2rem;">
+        <a href="docs/seguridad_LAN.pdf" download class="btn btn-ghost" style="font-size:11px;">
+          ↓ Ver informe técnico
+        </a>
+      </div>
+    </div>
 
-  <p class="project-desc">
-    Desarrollo de un laboratorio de ciberseguridad enfocado en el análisis de vulnerabilidades
-    en redes LAN y la detección de ataques en tiempo real. Simulación de técnicas ofensivas
-    a nivel de capa 2 y 3, incluyendo MAC Flooding, MAC Spoofing, ARP Spoofing,
-    DHCP Starvation y ataques WiFi.
-  </p>
-
-  <div class="project-stack">
-    <span class="stack-item">SNMP</span>
-    <span class="stack-item">Wireshark</span>
-    <span class="stack-item">DHCP</span>
-    <span class="stack-item">Cisco Switch</span>
-    <span class="stack-item">Wifi</span>
-  </div>
-
-  <div style="margin-top:1.2rem;">
-    <a href="docs/seguridad_LAN.pdf" download class="btn btn-ghost" style="font-size:11px;">
-      ↓ Ver informe técnico
-    </a>
-  </div>
-</div>
   </div>
 </section>
 
 <section id="education">
-  <div class="section-label">04 / formación</div>
-  <h2>Educación & Certificaciones</h2>
+  <div class="section-label"><span>04 / </span><span data-i18n="sec_education">formación</span></div>
+  <h2 data-i18n="h_education">Educación &amp; Certificaciones</h2>
   <div class="divider"></div>
 
   <div class="edu-timeline fade-up">
@@ -1013,6 +1682,11 @@ Informe técnico (próximamente)
       <div class="edu-date">Nov 2025 — Feb 2027</div>
       <div class="edu-degree">Máster en Ingeniería de Telecomunicación (Habilitante)</div>
       <div class="edu-school">Universidad Internacional de La Rioja (UNIR)</div>
+      <div class="edu-detail">
+        TFM: Extensión semántica del NWDAF mediante LLMs para la detección de ataques NAS
+        estructurales en redes 5G Core sobre Open5GS, aplicando la matriz
+        <strong style="color: rgb(136, 171, 185)">MITRE FiGHT</strong>.
+      </div>
     </div>
     <div class="edu-item">
       <div class="edu-date">Oct 2025 — Ago 2026</div>
@@ -1062,12 +1736,11 @@ Informe técnico (próximamente)
 <section id="contact">
   <div class="contact-glow"></div>
   <div class="content fade-up">
-    <div class="section-label" style="justify-content:center">05 / contacto</div>
-    <h2>Hablemos</h2>
-    <p>
-      Busco prácticas en ciberseguridad o telecomunicaciones mediante convenio universitario (UNIR),
-      con incorporación prevista en el verano de 2026. Abierto a proyectos, colaboraciones
-      o simplemente a intercambiar ideas sobre detección de amenazas.
+    <div class="section-label" style="justify-content:center"><span>05 / </span><span data-i18n="sec_contact">contacto</span></div>
+    <h2 data-i18n="h_contact">Hablemos</h2>
+    <p data-i18n="contact_desc">
+      Busco prácticas en ciberseguridad o telecomunicaciones mediante convenio universitario (UNIR).
+      Abierto a proyectos, colaboraciones o simplemente a intercambiar ideas relacionadas con la ciberseguridad.
     </p>
     <a class="btn btn-primary" href="mailto:juanrobledomenendez@gmail.com" style="margin:0 auto;display:inline-flex;">
       ✉ juanrobledomenendez@gmail.com
@@ -1078,15 +1751,15 @@ Informe técnico (próximamente)
         LinkedIn
       </a>
       <a class="contact-link" href="https://github.com/jarobledo-sec" target="_blank">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
         GitHub
       </a>
       <a class="contact-link" href="tel:+34615789858">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"></path></svg>
         +34 615 789 858
       </a>
       <a class="contact-link" href="CV_JuanAntonio_Robledo.pdf" download>
-        ↓ CV en PDF
+        ↓ <span data-i18n="contact_cv">CV en PDF</span>
       </a>
     </div>
   </div>
@@ -1098,30 +1771,1073 @@ Informe técnico (próximamente)
 </footer>
 
 <script>
+/* ---------- Grafo de fondo reactivo al scroll ---------- */
+(function(){
+  const canvas = document.getElementById('graph');
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let nodes = [];
+  let scrollY = window.scrollY || 0;
+  let targetScroll = scrollY;
+  let mouseX = -9999, mouseY = -9999;
 
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.12 });
-
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-
-  const tw = document.querySelector('.typewriter');
-  if (tw) {
-    tw.addEventListener('animationend', () => {
-      setTimeout(() => {
-        tw.style.animation = 'none';
-        tw.offsetHeight; // reflow
-        tw.style.animation = '';
-      }, 4000);
+  function buildNodes(){
+    const area = window.innerWidth * window.innerHeight;
+    // densidad un poco mayor para que se vea como una red densa
+    const count = Math.min(95, Math.max(50, Math.floor(area / 22000)));
+    nodes = new Array(count).fill(0).map(() => {
+      const layer = Math.random();
+      return {
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight * 1.8,
+        vx: (Math.random() - 0.5) * 0.20,
+        vy: (Math.random() - 0.5) * 0.20,
+        r: 0.8 + Math.random() * 2.0,
+        layer: 0.35 + layer * 1.5,
+        seed: Math.random() * Math.PI * 2,
+      };
     });
   }
+
+  function resize(){
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    buildNodes();
+  }
+
+  window.addEventListener('resize', resize);
+  window.addEventListener('scroll', () => { targetScroll = window.scrollY; }, { passive:true });
+  window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+  window.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
+
+  resize();
+
+  const MAX_DIST = 150;
+  const t0 = performance.now();
+
+  function frame(now){
+    scrollY += (targetScroll - scrollY) * 0.08;
+    const t = (now - t0) / 1000;
+
+    ctx.clearRect(0, 0, W, H);
+
+    for (let i = 0; i < nodes.length; i++){
+      const n = nodes[i];
+      n.x += n.vx + Math.sin(t * 0.3 + n.seed) * 0.05;
+      n.y += n.vy + Math.cos(t * 0.25 + n.seed) * 0.04;
+
+      if (n.x < -20) n.x = W + 20;
+      if (n.x > W + 20) n.x = -20;
+      if (n.y < -20) n.y = H * 1.8 + 20;
+      if (n.y > H * 1.8 + 20) n.y = -20;
+
+      const sy = n.y - scrollY * (n.layer * 0.35);
+
+      let dxm = n.x - mouseX, dym = sy - mouseY;
+      let dm = Math.hypot(dxm, dym);
+      let ox = 0, oy = 0;
+      if (dm < 130){
+        const k = (1 - dm / 130) * 18;
+        ox = (dxm / (dm || 1)) * k;
+        oy = (dym / (dm || 1)) * k;
+      }
+      n._sx = n.x + ox;
+      n._sy = sy + oy;
+    }
+
+    // Conexiones — líneas más nítidas
+    for (let i = 0; i < nodes.length; i++){
+      const a = nodes[i];
+      if (a._sy < -MAX_DIST || a._sy > H + MAX_DIST) continue;
+      for (let j = i + 1; j < nodes.length; j++){
+        const b = nodes[j];
+        if (b._sy < -MAX_DIST || b._sy > H + MAX_DIST) continue;
+        const dx = a._sx - b._sx;
+        const dy = a._sy - b._sy;
+        const d2 = dx*dx + dy*dy;
+        if (d2 < MAX_DIST * MAX_DIST){
+          const d = Math.sqrt(d2);
+          const alpha = (1 - d / MAX_DIST) * 0.75 * Math.min(a.layer, b.layer);
+          ctx.strokeStyle = `rgba(0, 212, 255, ${alpha.toFixed(3)})`;
+          ctx.lineWidth = 0.9;
+          ctx.beginPath();
+          ctx.moveTo(a._sx, a._sy);
+          ctx.lineTo(b._sx, b._sy);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Nodos: halo + núcleo brillante
+    for (let i = 0; i < nodes.length; i++){
+      const n = nodes[i];
+      if (n._sy < -10 || n._sy > H + 10) continue;
+      const glow = 0.55 + n.layer * 0.35;
+      const grd = ctx.createRadialGradient(n._sx, n._sy, 0, n._sx, n._sy, n.r * 7);
+      grd.addColorStop(0, `rgba(120, 230, 255, ${glow.toFixed(3)})`);
+      grd.addColorStop(1, `rgba(0, 212, 255, 0)`);
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(n._sx, n._sy, n.r * 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = `rgba(220, 245, 255, ${(0.85 + n.layer*0.15).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(n._sx, n._sy, n.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ---------- Animaciones de entrada y typewriter ---------- */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+/* ---------- Barra de progreso de scroll ---------- */
+const progressBar = document.getElementById('scrollProgress');
+const backTop = document.getElementById('backToTop');
+function updateScrollUI(){
+  const h = document.documentElement;
+  const scrolled = h.scrollTop;
+  const max = h.scrollHeight - h.clientHeight;
+  const pct = max > 0 ? (scrolled / max) * 100 : 0;
+  progressBar.style.width = pct + '%';
+  backTop.classList.toggle('visible', scrolled > 600);
+}
+window.addEventListener('scroll', updateScrollUI, { passive:true });
+updateScrollUI();
+
+backTop.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' }));
+
+/* ---------- Active section: nav links + side rail ---------- */
+const sectionIds = ['hero','about','skills','projects','education','contact'];
+const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+const navLinks = document.querySelectorAll('.nav-links a, .rail-dot');
+
+function setActive(id){
+  navLinks.forEach(a => {
+    const href = a.getAttribute('href');
+    const match = href === '#' + id || a.dataset.rail === id;
+    a.classList.toggle('active', match);
+  });
+}
+
+const sectionObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) setActive(e.target.id);
+  });
+}, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+sections.forEach(s => sectionObs.observe(s));
+
+/* ---------- Contadores animados de stats ---------- */
+function animateCounter(el, target, suffix=''){
+  const duration = 1400;
+  const start = performance.now();
+  const from = 0;
+  function step(now){
+    const t = Math.min(1, (now - start) / duration);
+    // ease-out cubic
+    const eased = 1 - Math.pow(1 - t, 3);
+    const v = Math.round(from + (target - from) * eased);
+    el.firstChild.nodeValue = v;
+    if (t < 1) requestAnimationFrame(step);
+    else el.firstChild.nodeValue = target;
+  }
+  requestAnimationFrame(step);
+}
+
+const statObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseInt(el.dataset.count, 10);
+    if (!isNaN(target)) {
+      // Reemplazamos el primer text node por "0"
+      if (el.firstChild && el.firstChild.nodeType === 3) {
+        el.firstChild.nodeValue = '0';
+        animateCounter(el, target);
+      }
+    }
+    statObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.stat-num[data-count]').forEach(el => statObs.observe(el));
+
+/* ---------- Cursor glow follower ---------- */
+(function(){
+  const glow = document.getElementById('cursorGlow');
+  if (!glow) return;
+  let tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+  let cx = tx, cy = ty;
+  let raf = null;
+  window.addEventListener('mousemove', e => {
+    tx = e.clientX; ty = e.clientY;
+    glow.classList.add('visible');
+    if (!raf) raf = requestAnimationFrame(loop);
+  });
+  window.addEventListener('mouseleave', () => glow.classList.remove('visible'));
+  function loop(){
+    cx += (tx - cx) * 0.12;
+    cy += (ty - cy) * 0.12;
+    glow.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+    if (Math.abs(tx - cx) > 0.5 || Math.abs(ty - cy) > 0.5) {
+      raf = requestAnimationFrame(loop);
+    } else {
+      raf = null;
+    }
+  }
+})();
+
+/* ---------- 3D tilt en project cards ---------- */
+(function(){
+  const cards = document.querySelectorAll('.project-card');
+  const MAX = 6; // grados max
+  cards.forEach(card => {
+    let raf = null;
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;   // 0..1
+      const py = (e.clientY - r.top) / r.height;   // 0..1
+      const rx = (0.5 - py) * MAX;
+      const ry = (px - 0.5) * MAX;
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+      });
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+})();
+
+/* ---------- Magnetic buttons ---------- */
+(function(){
+  const targets = document.querySelectorAll('.btn-primary, .contact-link');
+  targets.forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const r = btn.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width / 2);
+      const dy = e.clientY - (r.top + r.height / 2);
+      btn.style.transform = `translate(${dx * 0.18}px, ${dy * 0.25}px)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+  });
+})();
+
+/* ---------- Text scramble en hero subtitle ---------- */
+(function(){
+  const target = document.querySelector('.typewriter');
+  if (!target) return;
+  const roles = [
+    'Telecom & Security Engineer',
+    'SIEM & SOC Analyst',
+    'HIDS / NIDS Specialist',
+    'Pentester & Red Teamer',
+    '5G Security Researcher',
+    'MITRE ATT&CK Practitioner'
+  ];
+  const chars = '01<>/_$#%&*+=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let roleIdx = 0;
+
+  // Quitamos la animación typewriter original tras la primera vuelta
+  setTimeout(() => {
+    target.style.animation = 'none';
+    target.style.borderRight = '2px solid var(--accent)';
+    target.style.maxWidth = 'none';
+    target.style.width = 'auto';
+    cycle();
+  }, 3000);
+
+  function scramble(from, to){
+    return new Promise(resolve => {
+      const length = Math.max(from.length, to.length);
+      const queue = [];
+      for (let i = 0; i < length; i++){
+        const fromChar = from[i] || '';
+        const toChar = to[i] || '';
+        const start = Math.floor(Math.random() * 18);
+        const end = start + Math.floor(Math.random() * 18) + 6;
+        queue.push({ fromChar, toChar, start, end, char: '' });
+      }
+      let frame = 0;
+      function update(){
+        let output = '';
+        let complete = 0;
+        for (let i = 0; i < queue.length; i++){
+          const q = queue[i];
+          if (frame >= q.end){
+            output += q.toChar;
+            complete++;
+          } else if (frame >= q.start){
+            if (!q.char || Math.random() < 0.28){
+              q.char = chars[Math.floor(Math.random() * chars.length)];
+            }
+            output += `<span style="color: var(--accent); opacity:.7">${q.char}</span>`;
+          } else {
+            output += q.fromChar;
+          }
+        }
+        target.innerHTML = output;
+        if (complete === queue.length) resolve();
+        else { frame++; requestAnimationFrame(update); }
+      }
+      update();
+    });
+  }
+
+  async function cycle(){
+    while (true) {
+      roleIdx = (roleIdx + 1) % roles.length;
+      const current = target.textContent;
+      const next = roles[roleIdx];
+      await scramble(current, next);
+      await new Promise(r => setTimeout(r, 3000));
+    }
+  }
+})();
+
+/* ---------- Stagger reveal en cards ---------- */
+(function(){
+  const groups = [
+    '.projects-grid .project-card',
+    '.skills-grid .skill-category',
+    '.certs-grid .cert-card',
+    '.about-stats .stat-box'
+  ];
+  groups.forEach(sel => {
+    const items = document.querySelectorAll(sel);
+    items.forEach((it, i) => {
+      it.style.opacity = '0';
+      it.style.transform = 'translateY(10px)';
+      it.style.filter = 'blur(3px)';
+      it.style.transition = 'opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1), filter .8s cubic-bezier(.16,1,.3,1)';
+      it.style.transitionDelay = (i * 55) + 'ms';
+    });
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting){
+          e.target.style.opacity = '1';
+          e.target.style.transform = '';
+          e.target.style.filter = 'blur(0)';
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    items.forEach(it => io.observe(it));
+  });
+})();
+
+/* ---------- Konami code · Matrix mode easter egg ---------- */
+(function(){
+  const seq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let i = 0;
+  const toast = document.getElementById('konamiToast');
+  window.addEventListener('keydown', e => {
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (k === seq[i]) {
+      i++;
+      if (i === seq.length){
+        i = 0;
+        document.body.classList.toggle('matrix-mode');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2400);
+      }
+    } else {
+      i = (k === seq[0]) ? 1 : 0;
+    }
+  });
+})();
+
+/* ---------- Security marquee (deslizante lento a la izquierda) ---------- */
+(function(){
+  const track = document.getElementById('marqueeTrack');
+  const wrap = document.getElementById('marquee');
+  if (!track || !wrap) return;
+
+  const items = [
+    { type: 'ok',    label: 'SIEM',           text: 'Splunk · ELK · Wazuh' },
+    { type: '',      label: 'MITRE T1059',    text: 'Command and Scripting Interpreter' },
+    { type: 'alert', label: 'CVE-2024-3094',  text: 'XZ Utils Backdoor — supply chain' },
+    { type: 'ok',    label: 'HIDS',           text: 'OSSEC · Samhain · VelociRaptor' },
+    { type: '',      label: 'MITRE T1078',    text: 'Valid Accounts — defense evasion' },
+    { type: 'ok',    label: 'NIDS',           text: 'Snort · Suricata · Sagan' },
+    { type: 'alert', label: 'CVE-2023-46604', text: 'ActiveMQ RCE — actively exploited' },
+    { type: '',      label: 'NIST CSF',       text: 'Identify · Protect · Detect · Respond · Recover' },
+    { type: 'ok',    label: 'ISO 27001',      text: 'Information Security Management System' },
+    { type: '',      label: 'MITRE FiGHT',    text: '5G threat informed defense matrix' },
+    { type: 'alert', label: 'CVE-2024-21413', text: 'Outlook MonikerLink — credential leak' },
+    { type: 'ok',    label: 'NIS2 · ENS',     text: 'EU directive · National Security Framework' },
+    { type: '',      label: 'OPEN5GS',        text: 'NWDAF + LLM for NAS attack detection' },
+    { type: '',      label: 'DFIR',           text: 'Digital Forensics · Incident Response' },
+    { type: 'alert', label: 'OWASP A01:2021', text: 'Broken Access Control' },
+    { type: '',      label: 'IPv6 · SeND',    text: 'Secure Neighbor Discovery — TFG 10/10' },
+  ];
+
+  // construimos 2x para loop continuo
+  function renderOnce(){
+    return items.map(it => {
+      const cls = it.type ? ` ${it.type}` : '';
+      return `<span class="marquee-item">
+        <span class="dot-sep"></span>
+        <span class="tag-mq${cls}">${it.label}</span>
+        <span>${it.text}</span>
+      </span>`;
+    }).join('');
+  }
+  track.innerHTML = renderOnce() + renderOnce();
+
+  // medimos la mitad del track (un set), para hacer loop cuando llegue a -halfWidth
+  let halfWidth = 0;
+  function measure(){ halfWidth = track.scrollWidth / 2; }
+  // esperar a que el layout esté listo
+  requestAnimationFrame(measure);
+  window.addEventListener('resize', measure);
+
+  let x = 0;
+  let speed = 28;        // px/segundo (lento)
+  let targetSpeed = 28;
+  let paused = false;
+  let last = performance.now();
+
+  wrap.addEventListener('mouseenter', () => { /* marquee no se detiene en hover */ });
+  wrap.addEventListener('mouseleave', () => { /* noop */ });
+
+  // acelera ligeramente cuando se hace scroll hacia abajo
+  let lastScroll = window.scrollY;
+  window.addEventListener('scroll', () => {
+    const dy = window.scrollY - lastScroll;
+    lastScroll = window.scrollY;
+    targetSpeed = 28 + Math.min(60, Math.abs(dy) * 4);
+    clearTimeout(window.__mq_t);
+    window.__mq_t = setTimeout(() => { targetSpeed = 28; }, 220);
+  }, { passive:true });
+
+  function frame(now){
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    speed += (targetSpeed - speed) * 0.08;
+    if (!paused && halfWidth > 0){
+      x -= speed * dt;
+      if (x <= -halfWidth) x += halfWidth;
+      track.style.transform = `translate3d(${x}px,0,0)`;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ---------- Airport split-flap clock ---------- */
+(function(){
+  const root = document.getElementById('flipClock');
+  if (!root) return;
+  const slots = ['H','H','sep','M','M','sep','S','S'];
+  const flaps = [];
+  slots.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'flap' + (s === 'sep' ? ' sep' : '');
+    if (s === 'sep') {
+      el.textContent = ':';
+    } else {
+      el.innerHTML = '<span class="digit-current">0</span><span class="digit-next">0</span>';
+    }
+    root.appendChild(el);
+    flaps.push({ el, type: s });
+  });
+
+  function setDigit(flap, newChar){
+    if (flap.type === 'sep') return;
+    const cur = flap.el.querySelector('.digit-current');
+    const nxt = flap.el.querySelector('.digit-next');
+    if (cur.textContent === newChar) return;
+    nxt.textContent = newChar;
+    flap.el.classList.remove('flipping');
+    void flap.el.offsetWidth;
+    flap.el.classList.add('flipping');
+    setTimeout(() => {
+      cur.textContent = newChar;
+      flap.el.classList.remove('flipping');
+    }, 420);
+  }
+
+  function tick(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const str = pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+    const digits = [str[0], str[1], null, str[2], str[3], null, str[4], str[5]];
+    flaps.forEach((f, i) => {
+      if (f.type !== 'sep') setDigit(f, digits[i]);
+    });
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+
+/* ---------- CVE feed ticker ---------- */
+(function(){
+  const track = document.getElementById('cveTrack');
+  if (!track) return;
+  const items = [
+    { id:'CVE-2024-3094',  sev:'crit', title:{es:'XZ Utils — backdoor en cadena de suministro', en:'XZ Utils — supply chain backdoor'} },
+    { id:'CVE-2024-21413', sev:'high', title:{es:'Microsoft Outlook MonikerLink — robo de credenciales', en:'Microsoft Outlook MonikerLink — credential leak'} },
+    { id:'CVE-2023-46604', sev:'crit', title:{es:'Apache ActiveMQ — RCE explotado activamente', en:'Apache ActiveMQ — RCE actively exploited'} },
+    { id:'CVE-2024-6387',  sev:'high', title:{es:'OpenSSH regreSSHion — RCE pre-autenticación', en:'OpenSSH regreSSHion — pre-auth RCE'} },
+    { id:'CVE-2024-23897', sev:'crit', title:{es:'Jenkins CLI — lectura arbitraria de archivos', en:'Jenkins CLI — arbitrary file read'} },
+    { id:'CVE-2024-1709',  sev:'crit', title:{es:'ConnectWise ScreenConnect — bypass autenticación', en:'ConnectWise ScreenConnect — auth bypass'} },
+    { id:'CVE-2024-21762', sev:'crit', title:{es:'Fortinet FortiOS SSL VPN — RCE', en:'Fortinet FortiOS SSL VPN — RCE'} },
+    { id:'CVE-2023-44487', sev:'high', title:{es:'HTTP/2 Rapid Reset — DDoS récord', en:'HTTP/2 Rapid Reset — record-breaking DDoS'} },
+    { id:'CVE-2024-27198', sev:'crit', title:{es:'JetBrains TeamCity — bypass autenticación', en:'JetBrains TeamCity — auth bypass'} },
+    { id:'CVE-2024-3400',  sev:'crit', title:{es:'Palo Alto PAN-OS — comando arbitrario en GlobalProtect', en:'Palo Alto PAN-OS — GlobalProtect command injection'} },
+    { id:'CVE-2024-4577',  sev:'crit', title:{es:'PHP CGI Windows — inyección de argumentos', en:'PHP CGI on Windows — argument injection'} },
+    { id:'CVE-2024-7593',  sev:'crit', title:{es:'Ivanti vTM — bypass autenticación admin', en:'Ivanti vTM — admin auth bypass'} },
+  ];
+
+  function renderOnce(lang){
+    return items.map(it => {
+      const sevLabel = ({crit:'CRIT', high:'HIGH', med:'MED'})[it.sev] || it.sev.toUpperCase();
+      return `<span class="cve-item">
+        <span class="cve-sev ${it.sev}">${sevLabel}</span>
+        <span class="cve-id">${it.id}</span>
+        <span>· ${it.title[lang] || it.title.es}</span>
+      </span>`;
+    }).join('');
+  }
+
+  let halfWidth = 0;
+  function measure(){ halfWidth = track.scrollWidth / 2; }
+  function rebuild(lang){
+    track.innerHTML = renderOnce(lang) + renderOnce(lang);
+    requestAnimationFrame(measure);
+  }
+  let x = 0, speed = 32, last = performance.now();
+
+  rebuild(window.__lang || 'es');
+  window.addEventListener('resize', measure);
+  window.addEventListener('langchange', e => rebuild(e.detail.lang));
+
+  function frame(now){
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    if (halfWidth > 0){
+      x -= speed * dt;
+      if (x <= -halfWidth) x += halfWidth;
+      track.style.transform = `translate3d(${x}px,0,0)`;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ---------- i18n: detección automática + toggle ES/EN ---------- */
+(function(){
+  // UI: claves cortas (textContent)
+  const ui = {
+    es: {
+      cve_feed: 'CVE feed',
+      nav_about: 'about', nav_skills: 'skills', nav_projects: 'proyectos', nav_education: 'formación', nav_contact: 'contacto',
+      hero_label: 'Ciberseguridad · Telecomunicaciones · Detección de Amenazas',
+      hero_desc: 'Ingeniero de Telecomunicaciones (23) especializado en monitorización de amenazas, análisis de vulnerabilidades, gestión de incidentes y respuesta a ataques. Cursando simultáneamente el Máster en Ciberseguridad (US) y el Máster en Ingeniería de Telecomunicación (UNIR). Experiencia práctica con SIEM, HIDS/NIDS, pentesting y auditorías de seguridad — disponible para incorporación inmediata.',
+      cta_cv: 'Descargar CV', cta_projects: 'Ver proyectos', cta_contact: 'Contacto',
+      status_avail: 'Disponible para incorporación inmediata',
+      status_tfm: '2 TFM en curso — MITRE ATT&CK · 5G/NWDAF',
+      scroll: 'SCROLL',
+      sec_about: 'about', sec_skills: 'skills', sec_projects: 'proyectos', sec_education: 'formación', sec_contact: 'contacto',
+      h_about: 'Sobre mí', h_skills: 'Habilidades técnicas', h_projects: 'Proyectos destacados',
+      h_education: 'Educación & Certificaciones', h_contact: 'Hablemos',
+      contact_desc: 'Busco prácticas en ciberseguridad o telecomunicaciones mediante convenio universitario (UNIR). Abierto a proyectos, colaboraciones o simplemente a intercambiar ideas relacionadas con la ciberseguridad.',
+      contact_cv: 'CV en PDF'
+    },
+    en: {
+      cve_feed: 'CVE feed',
+      nav_about: 'about', nav_skills: 'skills', nav_projects: 'projects', nav_education: 'education', nav_contact: 'contact',
+      hero_label: 'Cybersecurity · Telecommunications · Threat Detection',
+      hero_desc: 'Telecommunications Engineer (23) specialized in threat monitoring, vulnerability analysis, incident management and attack response. Currently pursuing the MSc in Cybersecurity (US) and the MSc in Telecommunications Engineering (UNIR) simultaneously. Hands-on experience with SIEM, HIDS/NIDS, pentesting and security audits — available for immediate hire.',
+      cta_cv: 'Download CV', cta_projects: 'View projects', cta_contact: 'Contact',
+      status_avail: 'Available for immediate hire',
+      status_tfm: '2 MSc theses in progress — MITRE ATT&CK · 5G/NWDAF',
+      scroll: 'SCROLL',
+      sec_about: 'about', sec_skills: 'skills', sec_projects: 'projects', sec_education: 'education', sec_contact: 'contact',
+      h_about: 'About', h_skills: 'Technical skills', h_projects: 'Featured projects',
+      h_education: 'Education & Certifications', h_contact: "Let's talk",
+      contact_desc: 'Looking for internship opportunities in cybersecurity or telecommunications through a university agreement (UNIR). Open to projects, collaborations or simply chatting about cybersecurity.',
+      contact_cv: 'CV in PDF'
+    }
+  };
+
+  // Traducciones EN del contenido (selectores → reemplazo).
+  // ES = original del HTML (se snapshotea en data-orig en el primer apply).
+  // mode: 'text' = textContent, 'html' = innerHTML
+  const enMap = [
+    // About paragraphs
+    ['#about .about-text p:nth-of-type(1)', 'html',
+      'I am a telecommunications engineer (telematics specialty) graduated with a <strong>TFG (final degree project) rated 10/10</strong> on IPv6 security. I am currently pursuing in parallel the <strong>MSc in Cybersecurity at the University of Seville</strong> and the <strong>MSc in Telecommunications Engineering at UNIR</strong>.'],
+    ['#about .about-text p:nth-of-type(2)', 'html',
+      'One of my Master\'s Theses analyzes the network attack detection capability of the <strong>MITRE ATT&amp;CK Enterprise matrix using HIDS</strong>, which has led me to actively deploy and configure platforms such as Wazuh, OSSEC, Samhain and VelociRaptor in virtualized environments.'],
+    ['#about .about-text p:nth-of-type(3)', 'html',
+      'My profile combines the operation of <strong>SIEM, HIDS/NIDS and DFIR</strong> with <strong>security audits</strong>, vulnerability assessment (CVE, OWASP Top 10) and incident response, on top of frameworks such as <strong>ISO 27001, NIST CSF, ENS and NIS2</strong>. Available for immediate hire.'],
+
+    // Stat labels
+    ['#about .stat-box:nth-of-type(1) .stat-label', 'text', 'TFG IPv6/SeND grade'],
+    ['#about .stat-box:nth-of-type(2) .stat-label', 'text', 'Simultaneous master\'s'],
+    ['#about .stat-box:nth-of-type(3) .stat-label', 'text', 'SIEMs and HIDS/NIDS'],
+    ['#about .stat-box:nth-of-type(4) .stat-label', 'text', 'Advanced English'],
+
+    // Skill category titles
+    ['#skills .skill-category:nth-of-type(1) .skill-cat-title', 'html', '📊 Threat Monitoring &amp; Detection'],
+    ['#skills .skill-category:nth-of-type(2) .skill-cat-title', 'html', '🔴 Pentesting &amp; Vulnerability Assessment'],
+    ['#skills .skill-category:nth-of-type(3) .skill-cat-title', 'html', '📜 Security Standards &amp; Frameworks'],
+    ['#skills .skill-category:nth-of-type(4) .skill-cat-title', 'html', '🌐 Networking &amp; Telecom'],
+    ['#skills .skill-category:nth-of-type(5) .skill-cat-title', 'html', '⚙️ Systems, Scripting &amp; LLMs'],
+
+    // Skill tags (las traducibles, no las técnicas)
+    ['#skills .skill-category:nth-of-type(1) .skill-tag:nth-last-child(-n+5)', 'each', ['HIDS','NIDS','DFIR','Log analysis','Event correlation','Incident management']],
+
+    // Project tags
+    ['#projects .project-card:nth-of-type(1) .project-tag', 'text', 'IN PROGRESS'],
+    ['#projects .project-card:nth-of-type(2) .project-tag', 'text', 'IN PROGRESS'],
+    ['#projects .project-card:nth-of-type(7) .project-tag', 'text', 'RESEARCH'],
+
+    // Project titles
+    ['#projects .project-card:nth-of-type(3) .project-title', 'text', 'Breach Detection with SIEM — Wazuh'],
+    ['#projects .project-card:nth-of-type(4) .project-title', 'text', 'CTF — Forensic Security Analysis'],
+    ['#projects .project-card:nth-of-type(5) .project-title', 'text', 'BYOD Hotspot with Enterprise NAC'],
+    ['#projects .project-card:nth-of-type(6) .project-title', 'text', 'SSL/TLS VPN — Cryptographic Security'],
+    ['#projects .project-card:nth-of-type(7) .project-title', 'text', 'TFG — IPv6 with Secure Neighbor Discovery (SeND)'],
+    ['#projects .project-card:nth-of-type(8) .project-title', 'text', 'LAN Network Security — Attack Detection & Analysis'],
+
+    // Project descriptions
+    ['#projects .project-card:nth-of-type(1) .project-desc', 'text',
+      'Analysis of the network attack detection capability of the MITRE ATT&CK Enterprise matrix using HIDS systems. Active deployment in a virtualized lab: agent configuration, custom rules, event correlation and validation against techniques documented in ATT&CK.'],
+    ['#projects .project-card:nth-of-type(2) .project-desc', 'html',
+      'Semantic extension of the <strong style="color:var(--accent)">NWDAF using LLMs</strong> (Mistral-7B-Instruct) to detect structural NAS attacks on 5G Core networks in <strong style="color:var(--accent)">Open5GS</strong>, applying the <strong style="color:var(--accent)">MITRE FiGHT</strong> matrix. LLM inference integrated with detection pipelines and validated against known techniques in mobile networks.'],
+    ['#projects .project-card:nth-of-type(3) .project-desc', 'text',
+      'Log monitoring and analysis in a lab environment, intrusion detection and alert generation with Wazuh. HIDS agent integration, custom rule configuration and real-time correlation of security events.'],
+    ['#projects .project-card:nth-of-type(4) .project-desc', 'text',
+      'Capture the Flag exercise as part of the MSc in Cybersecurity (US). Identification and exploitation of vulnerabilities in a controlled environment, with a complete security technical report: findings, attack vectors and remediation recommendations.'],
+    ['#projects .project-card:nth-of-type(5) .project-desc', 'text',
+      'Design and implementation of a network access control system with 802.1X/MAB authentication, captive portal, VLAN and role management, integrating PacketFence, Cisco switches and Active Directory. Simulation of a real enterprise environment.'],
+    ['#projects .project-card:nth-of-type(6) .project-desc', 'text',
+      'Host-to-Host and client-server VPN configuration with OpenVPN. Cryptographic security tests, resistance analysis against DoS attacks and integrity verification of the encrypted channel.'],
+    ['#projects .project-card:nth-of-type(7) .project-desc', 'html',
+      'Development of a complete IPv6 test environment with the SeND protocol. Implementation, security validation and behavior analysis of the protocol against link-layer attacks. Grade: <strong style="color:var(--accent)">10 / 10</strong>.'],
+    ['#projects .project-card:nth-of-type(8) .project-desc', 'text',
+      'Development of a cybersecurity lab focused on LAN vulnerability analysis and real-time attack detection. Simulation of offensive techniques at layers 2 and 3, including MAC Flooding, MAC Spoofing, ARP Spoofing, DHCP Starvation and WiFi attacks.'],
+
+    // Report buttons (project 001 & 002 = "coming soon", rest = "View technical report")
+    ['#projects .project-card:nth-of-type(1) .btn.disabled', 'text', 'Technical report (coming soon)'],
+    ['#projects .project-card:nth-of-type(2) .btn.disabled', 'text', 'Technical report (coming soon)'],
+
+    // Education
+    ['#education .edu-item:nth-of-type(1) .edu-degree', 'text', 'MSc in Telecommunications Engineering (Qualifying)'],
+    ['#education .edu-item:nth-of-type(1) .edu-school', 'text', 'Universidad Internacional de La Rioja (UNIR)'],
+    ['#education .edu-item:nth-of-type(1) .edu-detail', 'html',
+      'Master\'s Thesis: Semantic extension of the NWDAF using LLMs to detect structural NAS attacks on 5G Core networks over Open5GS, applying the <strong style="color:var(--accent)">MITRE FiGHT</strong> matrix.'],
+    ['#education .edu-item:nth-of-type(2) .edu-degree', 'text', 'MSc in Cybersecurity'],
+    ['#education .edu-item:nth-of-type(2) .edu-school', 'text', 'University of Seville'],
+    ['#education .edu-item:nth-of-type(2) .edu-detail', 'text',
+      'Master\'s Thesis: Analysis of the network attack detection capability of the MITRE ATT&CK Enterprise matrix using HIDS — active deployment of Wazuh, OSSEC, Samhain and VelociRaptor.'],
+    ['#education .edu-item:nth-of-type(3) .edu-degree', 'text', 'BSc in Telecommunication Technologies Engineering (Telematics)'],
+    ['#education .edu-item:nth-of-type(3) .edu-school', 'text', 'University of Seville'],
+    ['#education .edu-item:nth-of-type(3) .edu-detail', 'html',
+      'Final Degree Project: Development of an IPv6 test environment with Secure Neighbor Discovery (SeND). Grade: <strong style="color:var(--accent)">10 / 10</strong>.'],
+
+    // Certifications
+    ['#education .cert-card:nth-of-type(1) .cert-name', 'text', 'Occupational Risk Prevention'],
+    ['#education .cert-card:nth-of-type(1) .cert-status', 'text', '✓ Certified — Basic level'],
+    ['#education .cert-card:nth-of-type(2) .cert-name', 'text', 'OSCP+ — Offensive Security Certified Professional+'],
+    ['#education .cert-card:nth-of-type(2) .cert-status', 'text', '⏳ In preparation — late 2026'],
+    ['#education .cert-card:nth-of-type(3) .cert-name', 'text', 'English — C1 Advanced'],
+    ['#education .cert-card:nth-of-type(3) .cert-status', 'text', '✓ Verified'],
+
+    // Footer
+    ['footer span:nth-of-type(1)', 'text', 'Juan Antonio Robledo Menéndez · 2026'],
+    ['footer span:nth-of-type(2)', 'text', 'SECURITY · TELECOM · DETECTION'],
+
+    // Side rail labels
+    ['.rail-dot[href="#hero"] .label', 'text', 'Home'],
+    ['.rail-dot[href="#about"] .label', 'text', 'About'],
+    ['.rail-dot[href="#skills"] .label', 'text', 'Skills'],
+    ['.rail-dot[href="#projects"] .label', 'text', 'Projects'],
+    ['.rail-dot[href="#education"] .label', 'text', 'Education'],
+    ['.rail-dot[href="#contact"] .label', 'text', 'Contact'],
+  ];
+
+  // Snapshot originales (ES) en data-orig la primera vez
+  let snapped = false;
+  function snapshot(){
+    if (snapped) return;
+    enMap.forEach(([sel, mode]) => {
+      if (mode === 'each') {
+        document.querySelectorAll(sel).forEach((el, i) => {
+          if (!el.hasAttribute('data-orig-text')) el.setAttribute('data-orig-text', el.textContent);
+        });
+      } else {
+        document.querySelectorAll(sel).forEach(el => {
+          if (mode === 'html' && !el.hasAttribute('data-orig-html')) el.setAttribute('data-orig-html', el.innerHTML);
+          if (mode === 'text' && !el.hasAttribute('data-orig-text')) el.setAttribute('data-orig-text', el.textContent);
+        });
+      }
+    });
+    snapped = true;
+  }
+
+  function applyContent(lang){
+    enMap.forEach(([sel, mode, value]) => {
+      const els = document.querySelectorAll(sel);
+      els.forEach((el, i) => {
+        if (lang === 'en') {
+          if (mode === 'each' && Array.isArray(value)) {
+            if (i < value.length) el.textContent = value[i];
+          } else if (mode === 'html') {
+            el.innerHTML = value;
+          } else {
+            el.textContent = value;
+          }
+        } else {
+          // ES → restaurar original
+          if (mode === 'html' && el.hasAttribute('data-orig-html')) {
+            el.innerHTML = el.getAttribute('data-orig-html');
+          } else if (el.hasAttribute('data-orig-text')) {
+            el.textContent = el.getAttribute('data-orig-text');
+          }
+        }
+      });
+    });
+  }
+
+  function detect(){
+    const stored = localStorage.getItem('portfolio_lang');
+    if (stored && ui[stored]) return stored;
+    const nav = (navigator.language || 'es').toLowerCase();
+    return nav.startsWith('en') ? 'en' : 'es';
+  }
+
+  function apply(lang){
+    snapshot();
+    const t = ui[lang] || ui.es;
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (t[key] !== undefined) el.textContent = t[key];
+    });
+    applyContent(lang);
+    document.querySelectorAll('.lang-toggle button').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    window.__lang = lang;
+    window.dispatchEvent(new CustomEvent('langchange', { detail: { lang }}));
+  }
+
+  document.querySelectorAll('.lang-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      localStorage.setItem('portfolio_lang', lang);
+      apply(lang);
+    });
+  });
+
+  window.__lang = detect();
+  apply(window.__lang);
+})();
+
+/* ---------- Analytics tracker (privado, localStorage) ---------- */
+(function(){
+  const KEY = '__portfolio_analytics';
+  function load(){
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch { return {}; }
+  }
+  function save(d){ try { localStorage.setItem(KEY, JSON.stringify(d)); } catch {} }
+
+  const data = load();
+  const now = Date.now();
+  const sessionId = 's_' + now.toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+
+  // Init estructura
+  data.visits = (data.visits || 0) + 1;
+  data.firstVisit = data.firstVisit || now;
+  data.lastVisit = now;
+  data.sessions = (data.sessions || 0) + 1;
+  data.totalTimeMs = data.totalTimeMs || 0;
+  data.maxScrollPct = data.maxScrollPct || 0;
+  data.sectionsViewed = data.sectionsViewed || {};
+  data.cvDownloads = data.cvDownloads || 0;
+  data.emailCopies = data.emailCopies || 0;
+  data.projectHovers = data.projectHovers || {};
+  data.langSwitches = data.langSwitches || { es: 0, en: 0 };
+  data.langPref = data.langPref || (navigator.language || 'es').slice(0,2);
+  data.browser = data.browser || (function(){
+    const ua = navigator.userAgent;
+    if (/Edg/.test(ua)) return 'Edge';
+    if (/Chrome/.test(ua) && !/Edg/.test(ua)) return 'Chrome';
+    if (/Firefox/.test(ua)) return 'Firefox';
+    if (/Safari/.test(ua) && !/Chrome/.test(ua)) return 'Safari';
+    return 'Other';
+  })();
+  data.platform = data.platform || (navigator.platform || 'unknown');
+  data.viewport = { w: window.innerWidth, h: window.innerHeight };
+  data.recentEvents = data.recentEvents || [];
+
+  function logEvent(type, detail){
+    data.recentEvents.unshift({ t: Date.now(), type, detail: detail || null });
+    if (data.recentEvents.length > 50) data.recentEvents.length = 50;
+    save(data);
+  }
+  // Inicio de sesión
+  logEvent('session_start');
+
+  // Tiempo en página
+  const sessionStart = now;
+  let sessionTimeAccumulated = 0;
+  let lastTick = sessionStart;
+  let visible = true;
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      sessionTimeAccumulated += Date.now() - lastTick;
+      visible = false;
+    } else {
+      lastTick = Date.now();
+      visible = true;
+    }
+  });
+  function flushTime(){
+    if (visible) {
+      sessionTimeAccumulated += Date.now() - lastTick;
+      lastTick = Date.now();
+    }
+    data.totalTimeMs += sessionTimeAccumulated;
+    sessionTimeAccumulated = 0;
+    save(data);
+  }
+  setInterval(flushTime, 5000);
+  window.addEventListener('beforeunload', () => {
+    flushTime();
+    logEvent('session_end', { durationMs: Date.now() - sessionStart });
+  });
+
+  // Scroll depth
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? Math.min(100, Math.round((window.scrollY / max) * 100)) : 0;
+    if (pct > data.maxScrollPct) {
+      data.maxScrollPct = pct;
+      save(data);
+    }
+  }, { passive: true });
+
+  // Secciones vistas
+  document.querySelectorAll('section[id]').forEach(s => {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = s.id;
+          data.sectionsViewed[id] = (data.sectionsViewed[id] || 0) + 1;
+          save(data);
+          io.unobserve(s);
+        }
+      });
+    }, { threshold: 0.35 });
+    io.observe(s);
+  });
+
+  // Hovers en project cards
+  document.querySelectorAll('.project-card').forEach(card => {
+    const title = card.querySelector('.project-title')?.textContent?.trim() || 'Proyecto';
+    let timer;
+    card.addEventListener('mouseenter', () => {
+      timer = setTimeout(() => {
+        data.projectHovers[title] = (data.projectHovers[title] || 0) + 1;
+        save(data);
+      }, 800);
+    });
+    card.addEventListener('mouseleave', () => clearTimeout(timer));
+  });
+
+  // CV download click
+  document.querySelectorAll('a[href$="CV_JuanAntonio_Robledo.pdf"]').forEach(a => {
+    a.addEventListener('click', () => {
+      data.cvDownloads++;
+      logEvent('cv_download');
+    });
+  });
+
+  // Email copy
+  document.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+    a.addEventListener('click', () => {
+      data.emailCopies++;
+      logEvent('email_copy');
+    });
+  });
+
+  // Lang switches
+  document.querySelectorAll('.lang-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const l = btn.dataset.lang;
+      data.langSwitches[l] = (data.langSwitches[l] || 0) + 1;
+      data.langPref = l;
+      logEvent('lang_switch', { lang: l });
+    });
+  });
+
+  window.__analytics = { read: load, save };
+})();
+
+/* ---------- Acceso oculto a metrics.html (atajo de teclado) ---------- */
+(function(){
+  // Ctrl/Cmd + Shift + M abre metrics.html
+  window.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'm') {
+      e.preventDefault();
+      window.location.href = 'metrics.html';
+    }
+  });
+})();
+
+/* ---------- Glitch en h2 al hover ---------- */
+(function(){
+  document.querySelectorAll('h2').forEach(h => {
+    h.dataset.text = h.textContent;
+    h.addEventListener('mouseenter', () => {
+      h.classList.add('glitching');
+      setTimeout(() => h.classList.remove('glitching'), 380);
+    });
+  });
+})();
+
+/* ---------- Scroll hint: fade tras pequeño scroll ---------- */
+(function(){
+  const hint = document.querySelector('.scroll-hint');
+  if (!hint) return;
+  window.addEventListener('scroll', () => {
+    hint.style.opacity = window.scrollY > 60 ? '0' : '1';
+  }, { passive:true });
+})();
+
+/* ---------- Sutil parallax en hero on mousemove ---------- */
+(function(){
+  const hero = document.querySelector('.hero-content');
+  if (!hero) return;
+  hero.parentElement.addEventListener('mousemove', e => {
+    const r = hero.parentElement.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    hero.style.transform = `translate(${px * -8}px, ${py * -6}px)`;
+  });
+  hero.parentElement.addEventListener('mouseleave', () => {
+    hero.style.transform = '';
+  });
+})();
+
+/* ---------- Toast helper ---------- */
+function showToast(msg, color){
+  const t = document.getElementById('fbToast');
+  if (!t) return;
+  t.textContent = msg;
+  if (color) {
+    t.style.borderColor = color;
+    t.style.color = color;
+    t.style.boxShadow = `0 0 22px ${color}55`;
+  }
+  t.classList.add('show');
+  clearTimeout(t.__hide);
+  t.__hide = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+/* ---------- Click en email = copia al portapapeles ---------- */
+(function(){
+  const email = 'juanrobledomenendez@gmail.com';
+  document.querySelectorAll(`a[href="mailto:${email}"]`).forEach(a => {
+    a.addEventListener('click', (e) => {
+      if (e.shiftKey || e.metaKey || e.ctrlKey) return; // dejar abrir cliente
+      e.preventDefault();
+      navigator.clipboard.writeText(email).then(() => {
+        showToast('✓ Email copiado al portapapeles', '#00e5a0');
+      }).catch(() => {
+        window.location.href = 'mailto:' + email;
+      });
+    });
+  });
+})();
+
+/* ---------- Confetti / partículas al descargar CV ---------- */
+(function(){
+  const cv = document.querySelectorAll('a[href$="CV_JuanAntonio_Robledo.pdf"]');
+  const canvas = document.getElementById('fxCanvas');
+  if (!cv.length || !canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const colors = ['#00d4ff','#7af0ff','#00e5a0','#ffd700','#ffffff'];
+  let particles = [];
+  let raf = null;
+
+  function burst(x, y){
+    for (let i = 0; i < 70; i++){
+      const a = Math.random() * Math.PI * 2;
+      const sp = 3 + Math.random() * 6;
+      particles.push({
+        x, y,
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp - 2,
+        g: 0.18 + Math.random() * 0.08,
+        life: 1,
+        size: 2 + Math.random() * 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * Math.PI,
+        rv: (Math.random() - 0.5) * 0.25
+      });
+    }
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+
+  function tick(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.vy += p.g;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 0.012;
+      p.rot += p.rv;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size, -p.size * 0.4, p.size * 2, p.size * 0.8);
+      ctx.restore();
+    });
+    particles = particles.filter(p => p.life > 0 && p.y < canvas.height + 40);
+    if (particles.length > 0) raf = requestAnimationFrame(tick);
+    else { raf = null; ctx.clearRect(0,0,canvas.width,canvas.height); }
+  }
+
+  cv.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const r = btn.getBoundingClientRect();
+      burst(r.left + r.width/2, r.top + r.height/2);
+      showToast('↓ Descargando CV…', '#00d4ff');
+    });
+  });
+})();
 </script>
 
 </body>
 </html>
-

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Portfolio · Analytics (private)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #080c10;
+    --bg2:       #0d1219;
+    --bg3:       #111923;
+    --border:    #1e2d3d;
+    --accent:    #00d4ff;
+    --accent3:   #ff6b35;
+    --text:      #c8d8e8;
+    --text-dim:  #5a7a99;
+    --text-mid:  #8aabb8;
+    --white:     #f0f8ff;
+    --green:     #00e5a0;
+    --red:       #ff4d6d;
+    --amber:     #ffc94d;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'Syne', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.012) 2px, rgba(0,212,255,0.012) 4px);
+    pointer-events: none; z-index: 9999;
+  }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 56px; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+    background: rgba(8,12,16,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar .brand {
+    font-weight: 600; color: var(--accent);
+    letter-spacing: .05em; text-decoration: none; font-size: 13px;
+  }
+  .topbar .brand span { color: var(--text-dim); }
+  .topbar .back, .topbar .reset {
+    color: var(--text-mid);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .4rem .8rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    transition: all .2s;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .topbar .back:hover  { color: var(--accent); border-color: var(--accent); }
+  .topbar .reset:hover { color: var(--red);    border-color: var(--red); }
+  .topbar .actions { display: flex; gap: .5rem; }
+  .topbar .live {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+  .topbar .live::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  main {
+    padding: 110px clamp(1.5rem, 4vw, 3rem) 6rem;
+    max-width: 1400px; margin: 0 auto;
+  }
+
+  .page-head { margin-bottom: 3rem; }
+  .page-head .label {
+    font-size: 10px;
+    letter-spacing: .25em;
+    color: var(--accent3);
+    text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: .5rem;
+    margin-bottom: 1rem;
+  }
+  .page-head .label::before {
+    content: ''; width: 18px; height: 1px; background: var(--accent3);
+  }
+  .page-head h1 {
+    font-family: var(--sans);
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .page-head h1 .dim { color: var(--text-dim); font-weight: 400; }
+  .page-head p {
+    color: var(--text-mid);
+    max-width: 70ch;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .page-head p code { color: var(--accent); background: rgba(0,212,255,0.08); padding: 1px 6px; border-radius: 2px; }
+
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    margin-bottom: 2.5rem;
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+  }
+  .kpi {
+    background: rgba(13,18,25,0.6);
+    padding: 1.4rem 1.5rem 1.2rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform .3s;
+  }
+  .kpi:hover::before { transform: scaleY(1); }
+  .kpi .label {
+    font-size: 10px;
+    letter-spacing: .14em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: .5rem;
+  }
+  .kpi .value {
+    font-family: var(--sans);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi .value .unit {
+    font-size: .95rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-left: .2rem;
+  }
+  .kpi .sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: .5rem;
+    letter-spacing: .05em;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: rgba(13,18,25,0.6);
+    border: 1px solid var(--border);
+    padding: 1.5rem 1.7rem 1.7rem;
+    border-radius: 2px;
+  }
+  .panel-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-head h2 {
+    font-family: var(--sans);
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--white);
+  }
+  .panel-head .meta {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .bar { margin-bottom: .9rem; font-size: 12px; }
+  .bar:last-child { margin-bottom: 0; }
+  .bar-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: .35rem;
+  }
+  .bar-label { color: var(--text); }
+  .bar-value { color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 500; }
+  .bar-track {
+    height: 6px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #7af0ff);
+    box-shadow: 0 0 8px rgba(0,212,255,0.4);
+    width: 0%;
+    transition: width 1s cubic-bezier(.16,1,.3,1);
+    border-radius: 1px;
+  }
+  .bar-fill.alt   { background: linear-gradient(90deg, var(--accent3), #ffb18b); box-shadow: 0 0 8px rgba(255,107,53,0.4); }
+  .bar-fill.green { background: linear-gradient(90deg, var(--green), #b6ffe0);  box-shadow: 0 0 8px rgba(0,229,160,0.4); }
+  .bar-fill.amber { background: linear-gradient(90deg, var(--amber), #ffe49b);  box-shadow: 0 0 8px rgba(255,201,77,0.4); }
+
+  .table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .table th, .table td {
+    text-align: left;
+    padding: .7rem .8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .table th {
+    font-size: 10px;
+    letter-spacing: .15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .table td:last-child {
+    text-align: right;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .table tbody tr:hover { background: rgba(0,212,255,0.04); }
+
+  /* Donut / lang preference */
+  .donut-wrap { display: flex; align-items: center; gap: 2rem; }
+  .donut {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    background: conic-gradient(from -90deg, var(--accent) 0 0);
+    transition: background 1.2s cubic-bezier(.16,1,.3,1);
+  }
+  .donut::after {
+    content: '';
+    position: absolute; inset: 24px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+  .donut-center {
+    position: absolute; inset: 24px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 1;
+  }
+  .donut-center .big {
+    font-family: var(--sans);
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--white);
+  }
+  .donut-center .small {
+    font-size: 9px;
+    letter-spacing: .15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-top: .2rem;
+  }
+  .legend { flex: 1; }
+  .legend-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px;
+    padding: .4rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .legend-row:last-child { border-bottom: none; }
+  .legend-row .lr-left { display: flex; align-items: center; gap: .55rem; }
+  .legend-row .swatch { width: 10px; height: 10px; border-radius: 1px; }
+  .legend-row .lr-val b { color: var(--white); font-weight: 500; }
+  .legend-row .lr-val { color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+  /* Big metric panel */
+  .big-panel {
+    background: rgba(13,18,25,0.6);
+    border: 1px solid var(--border);
+    padding: 1.5rem 1.7rem;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+  }
+  .big-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    margin-top: 1rem;
+  }
+  .big-grid > div {
+    background: rgba(8,12,16,0.92);
+    padding: 1rem 1.2rem;
+  }
+  .big-grid .lbl {
+    font-size: 10px;
+    letter-spacing: .14em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: .35rem;
+  }
+  .big-grid .val {
+    font-family: var(--sans);
+    font-size: 1.1rem;
+    color: var(--white);
+    font-weight: 600;
+  }
+  .big-grid .val.acc { color: var(--accent); }
+  .big-grid .val.amb { color: var(--amber); }
+  .big-grid .val.grn { color: var(--green); }
+
+  /* Activity log */
+  .log {
+    max-height: 360px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    padding: 1rem;
+    font-size: 11.5px;
+    line-height: 1.7;
+  }
+  .log::-webkit-scrollbar { width: 6px; }
+  .log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .log-row {
+    display: grid;
+    grid-template-columns: 80px 160px 1fr;
+    gap: 1rem;
+    padding: .25rem 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.04);
+  }
+  .log-row .ts { color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .log-row .ev { color: var(--accent); }
+  .log-row .ev.cv  { color: var(--amber); }
+  .log-row .ev.mail{ color: var(--green); }
+  .log-row .ev.lang{ color: #c099ff; }
+  .log-row .ev.end { color: var(--red); }
+  .log-row .det { color: var(--text-mid); }
+  .log-empty { color: var(--text-dim); font-style: italic; padding: 1rem 0; text-align: center; }
+
+  .status-strip {
+    margin-top: 2.5rem;
+    padding: 1rem 1.4rem;
+    background: rgba(8,12,16,0.6);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    display: flex; flex-wrap: wrap; gap: 1.4rem;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: .05em;
+  }
+  .status-strip b { color: var(--accent); font-weight: 500; }
+
+  .empty-state {
+    padding: 3rem 2rem;
+    border: 1px dashed var(--border);
+    color: var(--text-dim);
+    text-align: center;
+    margin: 2rem 0;
+  }
+  .empty-state b { color: var(--accent); }
+
+  .reveal { opacity: 0; transform: translateY(12px); filter: blur(3px); transition: all .8s cubic-bezier(.16,1,.3,1); }
+  .reveal.visible { opacity: 1; transform: none; filter: blur(0); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="index.html">jar<span>obledo</span><span style="color:var(--accent)">@sec</span> / <span style="color:var(--accent3)">analytics</span></a>
+  <span class="live">PRIVATE · LOCAL DATA</span>
+  <div class="actions">
+    <button class="reset" id="btnReset">↺ Reset</button>
+    <a class="back" href="index.html">← Back</a>
+  </div>
+</div>
+
+<main>
+  <div class="page-head reveal">
+    <div class="label">Private dashboard · Local analytics</div>
+    <h1>Portfolio <span class="dim">analytics</span></h1>
+    <p>Métricas reales registradas en <code>localStorage</code> mientras se interactúa con el portfolio (<code>index.html</code>). Los datos se guardan únicamente en este navegador y son visibles solo para ti. Para abrir esta página desde el portfolio usa <code>Ctrl/⌘ + Shift + M</code>.</p>
+  </div>
+
+  <div id="content"></div>
+</main>
+
+<script>
+(function(){
+  const KEY = '__portfolio_analytics';
+  const data = (function(){
+    try { return JSON.parse(localStorage.getItem(KEY)) || null; }
+    catch { return null; }
+  })();
+
+  const content = document.getElementById('content');
+
+  if (!data || !data.visits) {
+    content.innerHTML = `
+      <div class="empty-state reveal visible">
+        <p>No hay datos todavía. <b>Abre el portfolio</b> (<code>index.html</code>) en este mismo navegador (mismo origen) para empezar a registrar visitas, scroll, clics y tiempo en página.</p>
+      </div>`;
+    return;
+  }
+
+  // Helpers
+  function fmtMs(ms){
+    if (ms < 60000) return Math.round(ms/1000) + 's';
+    if (ms < 3600000) {
+      const m = Math.floor(ms/60000), s = Math.round((ms%60000)/1000);
+      return m + 'm ' + s + 's';
+    }
+    const h = Math.floor(ms/3600000), m = Math.round((ms%3600000)/60000);
+    return h + 'h ' + m + 'm';
+  }
+  function fmtDate(ts){
+    const d = new Date(ts);
+    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  }
+  function relTime(ts){
+    const diff = Date.now() - ts;
+    if (diff < 60000)   return Math.round(diff/1000) + 's ago';
+    if (diff < 3600000) return Math.round(diff/60000) + 'm ago';
+    if (diff < 86400000)return Math.round(diff/3600000) + 'h ago';
+    return Math.round(diff/86400000) + 'd ago';
+  }
+
+  const avgSession = data.totalTimeMs / Math.max(1, data.sessions);
+
+  // ── KPIs
+  const kpisHtml = [
+    { label: 'Total visits',     value: data.visits,                      sub: 'incl. esta sesión' },
+    { label: 'Sessions',         value: data.sessions,                    sub: 'distintas cargas de página' },
+    { label: 'Total time',       value: fmtMs(data.totalTimeMs),          sub: 'tiempo acumulado en página' },
+    { label: 'Avg session',      value: fmtMs(avgSession),                sub: 'por sesión' },
+    { label: 'Max scroll',       value: data.maxScrollPct + '%',          sub: 'profundidad máxima' },
+    { label: 'CV downloads',     value: data.cvDownloads,                 sub: 'clics totales' },
+    { label: 'Email copies',     value: data.emailCopies,                 sub: 'clics en mailto' },
+    { label: 'Lang switches',    value: (data.langSwitches.es||0) + (data.langSwitches.en||0), sub: 'ES + EN' },
+  ];
+  let html = '<div class="kpis reveal">';
+  kpisHtml.forEach(k => {
+    html += `<div class="kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`;
+  });
+  html += '</div>';
+
+  // ── Section views + Project hovers
+  const sections = data.sectionsViewed || {};
+  const secEntries = Object.entries(sections).sort((a,b)=>b[1]-a[1]);
+  const maxSec = Math.max(1, ...secEntries.map(e=>e[1]));
+
+  const proj = data.projectHovers || {};
+  const projEntries = Object.entries(proj).sort((a,b)=>b[1]-a[1]).slice(0, 12);
+  const maxProj = Math.max(1, ...projEntries.map(e=>e[1]));
+
+  html += `
+    <div class="grid-2">
+      <div class="panel reveal">
+        <div class="panel-head"><h2>Secciones vistas</h2><span class="meta">VISITAS POR SECCIÓN</span></div>
+        ${secEntries.length === 0 ? '<div class="log-empty">Sin datos todavía</div>' :
+          secEntries.map(([k,v], i) => `
+            <div class="bar">
+              <div class="bar-head"><span class="bar-label">${k}</span><span class="bar-value">${v}×</span></div>
+              <div class="bar-track"><div class="bar-fill ${['','alt','green','amber',''][i%5]}" data-pct="${(v/maxSec*100).toFixed(1)}"></div></div>
+            </div>`).join('')}
+      </div>
+
+      <div class="panel reveal">
+        <div class="panel-head"><h2>Proyectos con más interés</h2><span class="meta">HOVERS ≥ 0.8s</span></div>
+        ${projEntries.length === 0 ? '<div class="log-empty">Pasa el ratón sobre los proyectos en el portfolio</div>' :
+          projEntries.map(([k,v], i) => `
+            <div class="bar">
+              <div class="bar-head"><span class="bar-label">${k}</span><span class="bar-value">${v}×</span></div>
+              <div class="bar-track"><div class="bar-fill ${['','alt','green','amber',''][i%5]}" data-pct="${(v/maxProj*100).toFixed(1)}"></div></div>
+            </div>`).join('')}
+      </div>
+    </div>`;
+
+  // ── Lang donut + browser info
+  const langSw = data.langSwitches || { es: 0, en: 0 };
+  const totalLang = (langSw.es || 0) + (langSw.en || 0);
+  let langStops;
+  if (totalLang > 0) {
+    const esDeg = (langSw.es / totalLang) * 360;
+    langStops = `conic-gradient(from -90deg, var(--accent) 0deg ${esDeg}deg, var(--accent3) ${esDeg}deg 360deg)`;
+  } else {
+    langStops = 'conic-gradient(from -90deg, var(--border) 0 360deg)';
+  }
+
+  html += `
+    <div class="grid-2">
+      <div class="panel reveal">
+        <div class="panel-head"><h2>Preferencia de idioma</h2><span class="meta">SWITCHES</span></div>
+        <div class="donut-wrap">
+          <div class="donut" style="background:${langStops}">
+            <div class="donut-center">
+              <span class="big">${totalLang}</span>
+              <span class="small">SWITCHES</span>
+            </div>
+          </div>
+          <div class="legend">
+            <div class="legend-row">
+              <div class="lr-left"><span class="swatch" style="background:var(--accent)"></span><span>ES</span></div>
+              <div class="lr-val"><b>${langSw.es || 0}</b> / ${totalLang || '—'}</div>
+            </div>
+            <div class="legend-row">
+              <div class="lr-left"><span class="swatch" style="background:var(--accent3)"></span><span>EN</span></div>
+              <div class="lr-val"><b>${langSw.en || 0}</b> / ${totalLang || '—'}</div>
+            </div>
+            <div class="legend-row">
+              <div class="lr-left"><span>Idioma actual</span></div>
+              <div class="lr-val"><b>${(data.langPref || '?').toUpperCase()}</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel reveal">
+        <div class="panel-head"><h2>Sesión & dispositivo</h2><span class="meta">ENTORNO</span></div>
+        <div class="big-grid">
+          <div><div class="lbl">Primera visita</div><div class="val acc">${fmtDate(data.firstVisit)}</div></div>
+          <div><div class="lbl">Última visita</div><div class="val acc">${relTime(data.lastVisit)}</div></div>
+          <div><div class="lbl">Navegador</div><div class="val">${data.browser}</div></div>
+          <div><div class="lbl">Plataforma</div><div class="val">${data.platform}</div></div>
+          <div><div class="lbl">Viewport</div><div class="val">${data.viewport.w} × ${data.viewport.h}</div></div>
+          <div><div class="lbl">Locale navegador</div><div class="val">${navigator.language || '—'}</div></div>
+        </div>
+      </div>
+    </div>`;
+
+  // ── Activity log
+  const events = (data.recentEvents || []).slice(0, 30);
+  html += `
+    <div class="panel reveal" style="margin-bottom:2rem">
+      <div class="panel-head"><h2>Actividad reciente</h2><span class="meta">ÚLTIMOS ${events.length} EVENTOS</span></div>
+      <div class="log">
+        ${events.length === 0 ? '<div class="log-empty">Sin eventos</div>' :
+          events.map(e => {
+            const evClass = e.type.includes('cv') ? 'cv'
+                          : e.type.includes('email') ? 'mail'
+                          : e.type.includes('lang') ? 'lang'
+                          : e.type.includes('end') ? 'end' : '';
+            const det = e.detail ? JSON.stringify(e.detail) : '';
+            return `<div class="log-row">
+              <span class="ts">${relTime(e.t)}</span>
+              <span class="ev ${evClass}">${e.type}</span>
+              <span class="det">${det}</span>
+            </div>`;
+          }).join('')}
+      </div>
+    </div>
+
+    <div class="status-strip reveal">
+      <span>STORAGE KEY: <b>${KEY}</b></span>
+      <span>EVENTS LOGGED: <b>${(data.recentEvents||[]).length}</b></span>
+      <span>STATUS: <b style="color:var(--green)">ACTIVE</b></span>
+      <span>SCOPE: <b>localhost · same-origin</b></span>
+    </div>`;
+
+  content.innerHTML = html;
+
+  // Animar las barras
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.bar-fill').forEach((f, i) => {
+      setTimeout(() => f.style.width = (f.dataset.pct || 0) + '%', 100 + i * 40);
+    });
+  });
+
+  // Reveal animations
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+  }, { threshold: .05 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+
+// Reset button
+document.getElementById('btnReset').addEventListener('click', () => {
+  if (confirm('¿Borrar todas las analíticas locales? Esto no se puede deshacer.')) {
+    localStorage.removeItem('__portfolio_analytics');
+    location.reload();
+  }
+});
+</script>
+</body>
+</html>
